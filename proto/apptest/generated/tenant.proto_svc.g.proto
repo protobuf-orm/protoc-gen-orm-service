@@ -12,6 +12,7 @@ import "google/protobuf/timestamp.proto";
 service TenantService {
 	rpc Add(TenantAddRequest) returns (Tenant);
 	rpc Get(TenantGetRequest) returns (Tenant);
+	rpc Patch(TenantPatchRequest) returns (Tenant);
 	rpc Erase(TenantRef) returns (google.protobuf.Empty);
 }
 
@@ -40,4 +41,11 @@ message TenantSelect {
 message TenantGetRequest {
 	TenantRef ref = 1;
 	TenantSelect select = 2;
+}
+
+message TenantPatchRequest {
+	TenantRef target = 1;
+	string alias = 7;
+	string name = 9;
+	map<string,string> labels = 13;
 }

@@ -13,6 +13,7 @@ import "google/protobuf/timestamp.proto";
 service UserService {
 	rpc Add(UserAddRequest) returns (User);
 	rpc Get(UserGetRequest) returns (User);
+	rpc Patch(UserPatchRequest) returns (User);
 	rpc Erase(UserRef) returns (google.protobuf.Empty);
 }
 
@@ -49,4 +50,12 @@ message UserSelect {
 message UserGetRequest {
 	UserRef ref = 1;
 	UserSelect select = 2;
+}
+
+message UserPatchRequest {
+	UserRef target = 1;
+	TenantRef tenant = 3;
+	string alias = 7;
+	string name = 9;
+	map<string,string> labels = 13;
 }

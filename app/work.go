@@ -151,6 +151,9 @@ func (w *work) run(ctx context.Context, gf *protogen.GeneratedFile, entity graph
 	if rpcs.HasGet() {
 		fw.xRpcGet()
 	}
+	if rpcs.HasPatch() {
+		fw.xRpcPatch()
+	}
 	if rpcs.HasErase() {
 		fw.xRpcErase()
 	}

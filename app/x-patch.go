@@ -19,10 +19,20 @@ func (w *fileWork) xRpcPatch() ast.Rpc {
 
 func (w *fileWork) xMsgPatch() ast.Message {
 	return w.defineMsg("PatchRequest", func(m *ast.Message) {
+		m.Body = append(m.Body, ast.MessageField{
+			Type:   w.xMsgRef().Name,
+			Name:   "target",
+			Number: int(w.entity.Key().Number()),
+		})
+
 		for p := range w.entity.Props() {
+			if p.IsImmutable() {
+				continue
+			}
+
 			f := ast.MessageField{
 				Name:   string(p.FullName().Name()),
-				Number: int(p.Number()),
+				Number: int(p.Number())*2 - 1,
 			}
 			switch u := p.(type) {
 			case graph.Field:
@@ -36,6 +46,14 @@ func (w *fileWork) xMsgPatch() ast.Message {
 				panic("unknown type of graph prop")
 			}
 			m.Body = append(m.Body, f)
+
+			if p.IsNullable() {
+				m.Body = append(m.Body, ast.MessageField{
+					Type:   "bool",
+					Name:   string(p.FullName().Name()) + "_null",
+					Number: int(p.Number()) * 2,
+				})
+			}
 		}
 	})
 }
