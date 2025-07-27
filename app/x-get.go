@@ -17,14 +17,8 @@ func (w *fileWork) xRpcGet() ast.Rpc {
 }
 
 func (w *fileWork) xMsgGet() ast.Message {
-	name := nameMsg(w.entity, "GetRequest")
-	if v, ok := w.msgs[name]; ok {
-		return v
-	}
-
-	v := ast.Message{
-		Name: name,
-		Body: []ast.MessageBody{
+	return w.defineMsg("GetRequest", func(m *ast.Message) {
+		m.Body = []ast.MessageBody{
 			ast.MessageField{
 				Type:   w.xMsgRef().Name,
 				Name:   "ref",
@@ -35,9 +29,6 @@ func (w *fileWork) xMsgGet() ast.Message {
 				Name:   "select",
 				Number: 2,
 			},
-		},
-	}
-
-	w.defineMsg(v)
-	return v
+		}
+	})
 }

@@ -39,7 +39,7 @@ message UserRef {
 
 message UserSelect {
 	bool all = 1;
-	bool tenant = 2;
+	TenantSelect tenant = 2;
 	bool alias = 4;
 	bool name = 5;
 	bool labels = 7;

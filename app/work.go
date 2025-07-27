@@ -105,15 +105,29 @@ func (w *fileWork) useType(p string, fullname string) string {
 	return fullname
 }
 
-func (w *fileWork) defineMsg(v ast.Message) {
-	if _, ok := w.msgs[v.Name]; ok {
-		return
+func (w *fileWork) defineMsg(name string, f func(m *ast.Message)) ast.Message {
+	name = nameMsg(w.entity, name)
+	m, ok := w.msgs[name]
+	if ok {
+		return m
 	}
 
-	w.root.imports[v.Name] = w.path()
-	w.root.msgs[v.Name] = v
-	w.msgs[v.Name] = v
-	w.names = append(w.names, v.Name)
+	m = ast.Message{
+		Name: name,
+		Body: []ast.MessageBody{},
+	}
+
+	f(&m)
+	if m.Name != name {
+		panic("do not alter tht name")
+	}
+
+	w.root.imports[name] = w.path()
+	w.root.msgs[name] = m
+	w.msgs[name] = m
+	w.names = append(w.names, name)
+
+	return m
 }
 
 func (w *fileWork) defineRpc(v ast.Rpc) {

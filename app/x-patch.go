@@ -5,20 +5,20 @@ import (
 	"github.com/protobuf-orm/protoc-gen-orm-service/internal/ast"
 )
 
-func (w *fileWork) xRpcAdd() ast.Rpc {
-	req := w.xMsgAddRequest()
+func (w *fileWork) xRpcPatch() ast.Rpc {
+	req := w.xMsgPatch()
 	v := ast.Rpc{
-		Name:         "Add",
+		Name:         "Patch",
 		RequestType:  req.Name,
-		ResponseType: string(w.entity.FullName()),
+		ResponseType: w.useEntityType(w.entity),
 	}
 
 	w.defineRpc(v)
 	return v
 }
 
-func (w *fileWork) xMsgAddRequest() ast.Message {
-	return w.defineMsg("AddRequest", func(m *ast.Message) {
+func (w *fileWork) xMsgPatch() ast.Message {
+	return w.defineMsg("PatchRequest", func(m *ast.Message) {
 		for p := range w.entity.Props() {
 			f := ast.MessageField{
 				Name:   string(p.FullName().Name()),

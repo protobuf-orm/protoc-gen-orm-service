@@ -1,39 +1,35 @@
 package app
 
 import (
+	"github.com/protobuf-orm/protobuf-orm/graph"
 	"github.com/protobuf-orm/protoc-gen-orm-service/internal/ast"
 )
 
 func (w *fileWork) xMsgSelect() ast.Message {
-	name := nameMsg(w.entity, "Select")
-	if v, ok := w.msgs[name]; ok {
-		return v
-	}
+	return w.defineMsg("Select", func(m *ast.Message) {
+		for p := range w.entity.Props() {
+			t := "bool"
+			if f, ok := p.(graph.Edge); ok {
+				t = w.withEntity(f.Target()).xMsgSelect().Name
+			}
 
-	v := ast.Message{
-		Name: name,
-		Body: []ast.MessageBody{},
-	}
-	for p := range w.entity.Props() {
-		v.Body = append(v.Body, ast.MessageField{
-			Type:   "bool",
-			Name:   string(p.FullName().Name()),
-			Number: int(p.Number()),
-		})
-	}
-
-	k := w.entity.Key()
-	for i, f_ := range v.Body {
-		f := f_.(ast.MessageField)
-		if f.Number != int(k.Number()) {
-			continue
+			m.Body = append(m.Body, ast.MessageField{
+				Type:   t,
+				Name:   string(p.FullName().Name()),
+				Number: int(p.Number()),
+			})
 		}
 
-		f.Name = "all"
-		v.Body[i] = f
-		break
-	}
+		k := w.entity.Key()
+		for i, f_ := range m.Body {
+			f := f_.(ast.MessageField)
+			if f.Number != int(k.Number()) {
+				continue
+			}
 
-	w.defineMsg(v)
-	return v
+			f.Name = "all"
+			m.Body[i] = f
+			break
+		}
+	})
 }
