@@ -25,9 +25,15 @@ message UserAddRequest {
 	google.protobuf.Timestamp date_created = 15;
 }
 
+message UserRefByAlias {
+	string alias = 4;
+	TenantRef tenant = 2;
+}
+
 message UserRef {
-	oneof kind {
+	oneof key {
 		bytes id = 1;
+		UserRefByAlias alias = 4;
 	}
 }
 

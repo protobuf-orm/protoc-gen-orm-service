@@ -24,7 +24,7 @@ message TenantAddRequest {
 }
 
 message TenantRef {
-	oneof kind {
+	oneof key {
 		bytes id = 1;
 	}
 }

@@ -174,3 +174,8 @@ func (w *work) run(ctx context.Context, gf *protogen.GeneratedFile, entity graph
 
 	return nil
 }
+
+func nameMsg(v graph.Entity, name string) string {
+	pkg := v.FullName().Parent()
+	return string(pkg.Append(v.FullName().Name())) + name
+}

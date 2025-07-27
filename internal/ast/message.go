@@ -36,7 +36,7 @@ func (v MessageField) PrintTo(p Printer) {
 	if v.Label != "" {
 		fmt.Fprintf(p, "%s ", v.Label)
 	}
-	p.WriteTypename(v.Type)
+	p.PrintTypename(v.Type)
 	fmt.Fprintf(p, " %s = %d;", v.Name, v.Number)
 	p.Newline()
 }
@@ -71,6 +71,7 @@ type MessageOneofField struct {
 }
 
 func (v MessageOneofField) PrintTo(p Printer) {
-	fmt.Fprintf(p, "%s %s = %d;", v.Type, v.Name, v.Number)
+	p.PrintTypename(v.Type)
+	fmt.Fprintf(p, " %s = %d;", v.Name, v.Number)
 	p.Newline()
 }

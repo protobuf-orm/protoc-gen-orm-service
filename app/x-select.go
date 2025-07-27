@@ -5,8 +5,7 @@ import (
 )
 
 func (w *fileWork) xMsgSelect() ast.Message {
-	pkg := w.entity.FullName().Parent()
-	name := string(pkg.Append(w.entity.FullName().Name() + "Select"))
+	name := nameMsg(w.entity, "Select")
 	if v, ok := w.msgs[name]; ok {
 		return v
 	}

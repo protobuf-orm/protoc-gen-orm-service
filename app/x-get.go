@@ -17,8 +17,7 @@ func (w *fileWork) xRpcGet() ast.Rpc {
 }
 
 func (w *fileWork) xMsgGet() ast.Message {
-	pkg := w.entity.FullName().Parent()
-	name := string(pkg.Append(w.entity.FullName().Name() + "GetRequest"))
+	name := nameMsg(w.entity, "GetRequest")
 	if v, ok := w.msgs[name]; ok {
 		return v
 	}

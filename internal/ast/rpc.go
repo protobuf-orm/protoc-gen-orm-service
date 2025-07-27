@@ -20,12 +20,12 @@ func (v Rpc) PrintTo(p Printer) {
 	if v.RequestStream {
 		p.Write([]byte("stream "))
 	}
-	p.WriteTypename(v.RequestType)
+	p.PrintTypename(v.RequestType)
 	p.Write([]byte(") returns ("))
 	if v.ResponseStream {
 		p.Write([]byte("stream "))
 	}
-	p.WriteTypename(v.ResponseType)
+	p.PrintTypename(v.ResponseType)
 	p.Write([]byte(");"))
 	p.Newline()
 }

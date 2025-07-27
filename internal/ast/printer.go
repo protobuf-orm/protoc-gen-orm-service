@@ -7,7 +7,7 @@ import (
 
 type Printer interface {
 	Write(b []byte) (int, error)
-	WriteTypename(v string)
+	PrintTypename(v string)
 
 	Indent()
 	Dedent()
@@ -61,7 +61,7 @@ func (p *printer) Write(b []byte) (n int, err error) {
 	return
 }
 
-func (p *printer) WriteTypename(v string) {
+func (p *printer) PrintTypename(v string) {
 	name, ok := strings.CutPrefix(v, p.pkg)
 	if ok {
 		name = name[1:]

@@ -18,8 +18,7 @@ func (w *fileWork) xRpcAdd() ast.Rpc {
 }
 
 func (w *fileWork) xMsgAddRequest() ast.Message {
-	pkg := w.entity.FullName().Parent()
-	name := string(pkg.Append(w.entity.FullName().Name() + "AddRequest"))
+	name := nameMsg(w.entity, "AddRequest")
 	if v, ok := w.msgs[name]; ok {
 		return v
 	}
