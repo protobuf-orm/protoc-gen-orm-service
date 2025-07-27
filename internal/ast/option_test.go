@@ -11,6 +11,7 @@ import (
 func TestOption(t *testing.T) {
 	t.Run("protobuf defined option", WithPrinter(func(x *require.Assertions, b *strings.Builder, p ast.Printer) {
 		v := ast.Option{
+			Known: true,
 			Name:  "go_package",
 			Value: ast.String("foo"),
 		}

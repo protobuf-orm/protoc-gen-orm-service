@@ -28,6 +28,7 @@ type MessageField struct {
 	Type   string
 	Name   string
 	Number int
+	Opts   []FieldOption
 
 	tagMessageBody
 }
@@ -37,8 +38,21 @@ func (v MessageField) PrintTo(p Printer) {
 		fmt.Fprintf(p, "%s ", v.Label)
 	}
 	p.PrintTypename(v.Type)
-	fmt.Fprintf(p, " %s = %d;", v.Name, v.Number)
-	p.Newline()
+	fmt.Fprintf(p, " %s = %d", v.Name, v.Number)
+	if len(v.Opts) > 0 {
+		p.Write([]byte(" ["))
+		Scope(p, func() {
+			for i, opt := range v.Opts {
+				if i > 0 {
+					p.Write([]byte(", "))
+				}
+				opt.PrintTo(p)
+			}
+		}, "];")
+	} else {
+		p.Write([]byte(";"))
+		p.Newline()
+	}
 }
 
 type MessageOneof struct {

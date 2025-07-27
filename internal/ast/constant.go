@@ -9,6 +9,20 @@ type Constant interface {
 	constant()
 }
 
+type Value string
+
+func (v Value) constant() {}
+func (v Value) PrintTo(p Printer) {
+	fmt.Fprintf(p, "%s", v)
+}
+
+type Unsafe string
+
+func (v Unsafe) constant() {}
+func (v Unsafe) PrintTo(p Printer) {
+	fmt.Fprintf(p, "%s", v)
+}
+
 type Int int
 
 func (v Int) constant() {}

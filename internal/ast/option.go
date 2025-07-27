@@ -2,13 +2,11 @@ package ast
 
 import (
 	"fmt"
-	"strings"
-
-	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 type Option struct {
-	Name  protoreflect.FullName
+	Known bool
+	Name  string
 	Value Constant
 
 	tagTopLevelDef
@@ -17,7 +15,7 @@ type Option struct {
 
 func (v Option) PrintTo(p Printer) {
 	p.Write([]byte("option "))
-	if v.Name.Parent() == "" {
+	if v.Known {
 		p.Write([]byte(v.Name))
 	} else {
 		fmt.Fprintf(p, "(%s)", v.Name)
@@ -29,19 +27,33 @@ func (v Option) PrintTo(p Printer) {
 }
 
 type FieldOption struct {
-	Name     string
-	Constant Constant
+	Known bool
+	Name  string
+	Value Constant
 
 	tagEnumBody
 }
 
+var (
+	FeaturesFieldPresenceImplicit = knownFieldOption("features.field_presence", Value("IMPLICIT"))
+	FeaturesFieldPresenceExplicit = knownFieldOption("features.field_presence", Value("EXPLICIT"))
+)
+
+func knownFieldOption(name string, value Constant) FieldOption {
+	return FieldOption{
+		Known: true,
+		Name:  name,
+		Value: value,
+	}
+}
+
 func (v FieldOption) PrintTo(p Printer) {
-	if strings.Contains(v.Name, ".") {
-		fmt.Fprintf(p, "(%s)", v.Name)
-	} else {
+	if v.Known {
 		p.Write([]byte(v.Name))
+	} else {
+		fmt.Fprintf(p, "(%s)", v.Name)
 	}
 	fmt.Fprintf(p, " = ")
-	v.Constant.PrintTo(p)
+	v.Value.PrintTo(p)
 	p.Newline()
 }

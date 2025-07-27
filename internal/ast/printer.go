@@ -18,7 +18,7 @@ type PrinterTo interface {
 	PrintTo(p Printer)
 }
 
-func Scope(p Printer, closer string, f func()) {
+func Scope(p Printer, f func(), closer string) {
 	p.Newline()
 	p.Indent()
 	f()
@@ -28,11 +28,11 @@ func Scope(p Printer, closer string, f func()) {
 }
 
 func ScopedPrint[T PrinterTo](p Printer, vs []T, closer string) {
-	Scope(p, closer, func() {
+	Scope(p, func() {
 		for _, v := range vs {
 			v.PrintTo(p)
 		}
-	})
+	}, closer)
 }
 
 type printer struct {

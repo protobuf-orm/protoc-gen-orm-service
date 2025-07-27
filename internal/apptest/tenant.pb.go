@@ -25,8 +25,8 @@ const (
 type Tenant struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Id          []byte                 `protobuf:"bytes,1,opt,name=id"`
-	xxx_hidden_Alias       *string                `protobuf:"bytes,4,opt,name=alias"`
-	xxx_hidden_Name        *string                `protobuf:"bytes,5,opt,name=name"`
+	xxx_hidden_Alias       string                 `protobuf:"bytes,4,opt,name=alias"`
+	xxx_hidden_Name        string                 `protobuf:"bytes,5,opt,name=name"`
 	xxx_hidden_Labels      map[string]string      `protobuf:"bytes,7,rep,name=labels" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	xxx_hidden_DateCreated *timestamppb.Timestamp `protobuf:"bytes,15,opt,name=date_created,json=dateCreated"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
@@ -69,20 +69,14 @@ func (x *Tenant) GetId() []byte {
 
 func (x *Tenant) GetAlias() string {
 	if x != nil {
-		if x.xxx_hidden_Alias != nil {
-			return *x.xxx_hidden_Alias
-		}
-		return ""
+		return x.xxx_hidden_Alias
 	}
 	return ""
 }
 
 func (x *Tenant) GetName() string {
 	if x != nil {
-		if x.xxx_hidden_Name != nil {
-			return *x.xxx_hidden_Name
-		}
-		return ""
+		return x.xxx_hidden_Name
 	}
 	return ""
 }
@@ -110,13 +104,11 @@ func (x *Tenant) SetId(v []byte) {
 }
 
 func (x *Tenant) SetAlias(v string) {
-	x.xxx_hidden_Alias = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 5)
+	x.xxx_hidden_Alias = v
 }
 
 func (x *Tenant) SetName(v string) {
-	x.xxx_hidden_Name = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 5)
+	x.xxx_hidden_Name = v
 }
 
 func (x *Tenant) SetLabels(v map[string]string) {
@@ -134,20 +126,6 @@ func (x *Tenant) HasId() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *Tenant) HasAlias() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *Tenant) HasName() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
-}
-
 func (x *Tenant) HasDateCreated() bool {
 	if x == nil {
 		return false
@@ -160,16 +138,6 @@ func (x *Tenant) ClearId() {
 	x.xxx_hidden_Id = nil
 }
 
-func (x *Tenant) ClearAlias() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Alias = nil
-}
-
-func (x *Tenant) ClearName() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
-	x.xxx_hidden_Name = nil
-}
-
 func (x *Tenant) ClearDateCreated() {
 	x.xxx_hidden_DateCreated = nil
 }
@@ -178,8 +146,8 @@ type Tenant_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	Id          []byte
-	Alias       *string
-	Name        *string
+	Alias       string
+	Name        string
 	Labels      map[string]string
 	DateCreated *timestamppb.Timestamp
 }
@@ -192,14 +160,8 @@ func (b0 Tenant_builder) Build() *Tenant {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 5)
 		x.xxx_hidden_Id = b.Id
 	}
-	if b.Alias != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 5)
-		x.xxx_hidden_Alias = b.Alias
-	}
-	if b.Name != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 5)
-		x.xxx_hidden_Name = b.Name
-	}
+	x.xxx_hidden_Alias = b.Alias
+	x.xxx_hidden_Name = b.Name
 	x.xxx_hidden_Labels = b.Labels
 	x.xxx_hidden_DateCreated = b.DateCreated
 	return m0
@@ -209,11 +171,11 @@ var File_apptest_tenant_proto protoreflect.FileDescriptor
 
 const file_apptest_tenant_proto_rawDesc = "" +
 	"\n" +
-	"\x14apptest/tenant.proto\x12\aapptest\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\torm.proto\"\x90\x02\n" +
+	"\x14apptest/tenant.proto\x12\aapptest\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\torm.proto\"\xac\x02\n" +
 	"\x06Tenant\x12\x18\n" +
-	"\x02id\x18\x01 \x01(\fB\b\xea\x82\x16\x04\x10@(\x01R\x02id\x12\x14\n" +
-	"\x05alias\x18\x04 \x01(\tR\x05alias\x12\x12\n" +
-	"\x04name\x18\x05 \x01(\tR\x04name\x123\n" +
+	"\x02id\x18\x01 \x01(\fB\b\xea\x82\x16\x04\x10@(\x01R\x02id\x12\"\n" +
+	"\x05alias\x18\x04 \x01(\tB\f\xea\x82\x16\x03\x82\x01\x00\xaa\x01\x02\b\x02R\x05alias\x12 \n" +
+	"\x04name\x18\x05 \x01(\tB\f\xea\x82\x16\x03\x82\x01\x00\xaa\x01\x02\b\x02R\x04name\x123\n" +
 	"\x06labels\x18\a \x03(\v2\x1b.apptest.Tenant.LabelsEntryR\x06labels\x12H\n" +
 	"\fdate_created\x18\x0f \x01(\v2\x1a.google.protobuf.TimestampB\t\xea\x82\x16\x05@\x01\x82\x01\x00R\vdateCreated\x1a9\n" +
 	"\vLabelsEntry\x12\x10\n" +

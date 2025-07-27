@@ -28,6 +28,10 @@ func (w *fileWork) xMsgAddRequest() ast.Message {
 			case graph.Field:
 				t := w.useFieldType(u)
 				f.Type = t
+				if u.IsOptional() {
+					f.Opts = append(f.Opts, ast.FeaturesFieldPresenceImplicit)
+				}
+
 			case graph.Edge:
 				t := w.withEntity(u.Target()).xMsgRef()
 				f.Type = t.Name

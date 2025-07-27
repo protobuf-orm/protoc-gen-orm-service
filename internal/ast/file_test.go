@@ -16,6 +16,7 @@ func TestFile(t *testing.T) {
 		},
 		Options: []ast.Option{
 			{
+				Known: true,
 				Name:  "go_package",
 				Value: ast.String("github.com/protobuf-orm"),
 			},

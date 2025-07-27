@@ -26,12 +26,10 @@ type User struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Id          []byte                 `protobuf:"bytes,1,opt,name=id"`
 	xxx_hidden_Tenant      *Tenant                `protobuf:"bytes,2,opt,name=tenant"`
-	xxx_hidden_Alias       *string                `protobuf:"bytes,4,opt,name=alias"`
-	xxx_hidden_Name        *string                `protobuf:"bytes,5,opt,name=name"`
+	xxx_hidden_Alias       string                 `protobuf:"bytes,4,opt,name=alias"`
+	xxx_hidden_Name        string                 `protobuf:"bytes,5,opt,name=name"`
 	xxx_hidden_Labels      map[string]string      `protobuf:"bytes,7,rep,name=labels" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	xxx_hidden_DateCreated *timestamppb.Timestamp `protobuf:"bytes,15,opt,name=date_created,json=dateCreated"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
@@ -77,20 +75,14 @@ func (x *User) GetTenant() *Tenant {
 
 func (x *User) GetAlias() string {
 	if x != nil {
-		if x.xxx_hidden_Alias != nil {
-			return *x.xxx_hidden_Alias
-		}
-		return ""
+		return x.xxx_hidden_Alias
 	}
 	return ""
 }
 
 func (x *User) GetName() string {
 	if x != nil {
-		if x.xxx_hidden_Name != nil {
-			return *x.xxx_hidden_Name
-		}
-		return ""
+		return x.xxx_hidden_Name
 	}
 	return ""
 }
@@ -114,7 +106,6 @@ func (x *User) SetId(v []byte) {
 		v = []byte{}
 	}
 	x.xxx_hidden_Id = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 6)
 }
 
 func (x *User) SetTenant(v *Tenant) {
@@ -122,13 +113,11 @@ func (x *User) SetTenant(v *Tenant) {
 }
 
 func (x *User) SetAlias(v string) {
-	x.xxx_hidden_Alias = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 6)
+	x.xxx_hidden_Alias = v
 }
 
 func (x *User) SetName(v string) {
-	x.xxx_hidden_Name = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 6)
+	x.xxx_hidden_Name = v
 }
 
 func (x *User) SetLabels(v map[string]string) {
@@ -139,32 +128,11 @@ func (x *User) SetDateCreated(v *timestamppb.Timestamp) {
 	x.xxx_hidden_DateCreated = v
 }
 
-func (x *User) HasId() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
-}
-
 func (x *User) HasTenant() bool {
 	if x == nil {
 		return false
 	}
 	return x.xxx_hidden_Tenant != nil
-}
-
-func (x *User) HasAlias() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
-}
-
-func (x *User) HasName() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
 }
 
 func (x *User) HasDateCreated() bool {
@@ -174,23 +142,8 @@ func (x *User) HasDateCreated() bool {
 	return x.xxx_hidden_DateCreated != nil
 }
 
-func (x *User) ClearId() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Id = nil
-}
-
 func (x *User) ClearTenant() {
 	x.xxx_hidden_Tenant = nil
-}
-
-func (x *User) ClearAlias() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
-	x.xxx_hidden_Alias = nil
-}
-
-func (x *User) ClearName() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
-	x.xxx_hidden_Name = nil
 }
 
 func (x *User) ClearDateCreated() {
@@ -202,8 +155,8 @@ type User_builder struct {
 
 	Id          []byte
 	Tenant      *Tenant
-	Alias       *string
-	Name        *string
+	Alias       string
+	Name        string
 	Labels      map[string]string
 	DateCreated *timestamppb.Timestamp
 }
@@ -212,19 +165,10 @@ func (b0 User_builder) Build() *User {
 	m0 := &User{}
 	b, x := &b0, m0
 	_, _ = b, x
-	if b.Id != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 6)
-		x.xxx_hidden_Id = b.Id
-	}
+	x.xxx_hidden_Id = b.Id
 	x.xxx_hidden_Tenant = b.Tenant
-	if b.Alias != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 6)
-		x.xxx_hidden_Alias = b.Alias
-	}
-	if b.Name != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 6)
-		x.xxx_hidden_Name = b.Name
-	}
+	x.xxx_hidden_Alias = b.Alias
+	x.xxx_hidden_Name = b.Name
 	x.xxx_hidden_Labels = b.Labels
 	x.xxx_hidden_DateCreated = b.DateCreated
 	return m0
@@ -234,12 +178,12 @@ var File_apptest_user_proto protoreflect.FileDescriptor
 
 const file_apptest_user_proto_rawDesc = "" +
 	"\n" +
-	"\x12apptest/user.proto\x12\aapptest\x1a\x14apptest/tenant.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\torm.proto\"\xd7\x02\n" +
-	"\x04User\x12\x18\n" +
-	"\x02id\x18\x01 \x01(\fB\b\xea\x82\x16\x04\x10@(\x01R\x02id\x12'\n" +
-	"\x06tenant\x18\x02 \x01(\v2\x0f.apptest.TenantR\x06tenant\x12\x14\n" +
-	"\x05alias\x18\x04 \x01(\tR\x05alias\x12\x12\n" +
-	"\x04name\x18\x05 \x01(\tR\x04name\x121\n" +
+	"\x12apptest/user.proto\x12\aapptest\x1a\x14apptest/tenant.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\torm.proto\"\xf8\x02\n" +
+	"\x04User\x12\x1d\n" +
+	"\x02id\x18\x01 \x01(\fB\r\xea\x82\x16\x04\x10@(\x01\xaa\x01\x02\b\x02R\x02id\x12'\n" +
+	"\x06tenant\x18\x02 \x01(\v2\x0f.apptest.TenantR\x06tenant\x12\"\n" +
+	"\x05alias\x18\x04 \x01(\tB\f\xea\x82\x16\x03\x82\x01\x00\xaa\x01\x02\b\x02R\x05alias\x12 \n" +
+	"\x04name\x18\x05 \x01(\tB\f\xea\x82\x16\x03\x82\x01\x00\xaa\x01\x02\b\x02R\x04name\x121\n" +
 	"\x06labels\x18\a \x03(\v2\x19.apptest.User.LabelsEntryR\x06labels\x12H\n" +
 	"\fdate_created\x18\x0f \x01(\v2\x1a.google.protobuf.TimestampB\t\xea\x82\x16\x05@\x01\x82\x01\x00R\vdateCreated\x1a9\n" +
 	"\vLabelsEntry\x12\x10\n" +
