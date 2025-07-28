@@ -141,7 +141,7 @@ func (w *fileWork) defineRpc(v ast.Rpc) {
 	w.rpcs = append(w.rpcs, v)
 }
 
-func (w *work) run(ctx context.Context, gf *protogen.GeneratedFile, entity graph.Entity) error {
+func (w *work) run(ctx context.Context, src *protogen.File, gf *protogen.GeneratedFile, entity graph.Entity) error {
 	fw := w.newFileWork(entity)
 
 	rpcs := entity.Rpcs()
@@ -158,9 +158,19 @@ func (w *work) run(ctx context.Context, gf *protogen.GeneratedFile, entity graph
 		fw.xRpcErase()
 	}
 
+	// TODO: do not write a file here.
+	// it can be duplicated if there are two or more entities in the same file.
 	f := ast.File{
 		Edition: ast.Edition2023,
 		Package: string(entity.Package()),
+		// TODO: copy options from the `src`?
+		Options: []ast.Option{
+			{
+				Known: true,
+				Name:  "go_package",
+				Value: ast.String(src.GoImportPath),
+			},
+		},
 		Defs: []ast.TopLevelDef{
 			ast.Service{
 				Name: string(entity.FullName().Name()) + "Service",

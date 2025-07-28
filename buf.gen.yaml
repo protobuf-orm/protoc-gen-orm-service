@@ -12,4 +12,4 @@ plugins:
   - local: ./protoc-gen-orm-service
     out: ./proto
     opt:
-      - namer=generated/{{.Name}}_svc.g.proto
+      - namer={{.Name}}_svc.g.proto

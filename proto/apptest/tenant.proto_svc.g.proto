@@ -9,6 +9,8 @@ import "apptest/tenant.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
+option go_package = "github.com/protobuf-orm/protoc-gen-orm-service/internal/apptest";
+
 service TenantService {
 	rpc Add(TenantAddRequest) returns (Tenant);
 	rpc Get(TenantGetRequest) returns (Tenant);
@@ -25,9 +27,7 @@ message TenantAddRequest {
 		features.field_presence = IMPLICIT
 	];
 	map<string,string> labels = 7;
-	google.protobuf.Timestamp date_created = 15 [
-		features.field_presence = IMPLICIT
-	];
+	google.protobuf.Timestamp date_created = 15;
 }
 
 message TenantRef {

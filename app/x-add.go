@@ -28,7 +28,7 @@ func (w *fileWork) xMsgAddRequest() ast.Message {
 			case graph.Field:
 				t := w.useFieldType(u)
 				f.Type = t
-				if u.IsOptional() {
+				if u.IsOptional() && u.Type().IsScalar() {
 					f.Opts = append(f.Opts, ast.FeaturesFieldPresenceImplicit)
 				}
 
