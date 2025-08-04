@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/protobuf-orm/protobuf-orm/graph"
@@ -70,6 +71,7 @@ func (a *App) Run(ctx context.Context, p *protogen.Plugin, g *graph.Graph) error
 
 func (a *App) newGeneratedFile(p *protogen.Plugin, f *protogen.File) (*protogen.GeneratedFile, string, error) {
 	dir, name := filepath.Split(f.Desc.Path())
+	name = strings.TrimSuffix(name, filepath.Ext(name))
 
 	var b bytes.Buffer
 	if err := a.namer.Execute(&b, struct{ Name string }{Name: name}); err != nil {
