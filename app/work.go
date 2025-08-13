@@ -130,7 +130,7 @@ func (w *fileWork) defineMsg(name string, f func(m *ast.Message)) ast.Message {
 	return m
 }
 
-func (w *fileWork) defineRpc(v ast.Rpc) {
+func (w *fileWork) defineRpc(v ast.Rpc, comment ast.Comment) {
 	if _, ok := w.root.imports[v.RequestType]; !ok {
 		panic(fmt.Sprintf("request type not found: %s", v.RequestType))
 	}
@@ -138,6 +138,7 @@ func (w *fileWork) defineRpc(v ast.Rpc) {
 		panic(fmt.Sprintf("response type not found: %s", v.ResponseType))
 	}
 
+	w.rpcs = append(w.rpcs, comment)
 	w.rpcs = append(w.rpcs, v)
 }
 

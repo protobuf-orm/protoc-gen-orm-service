@@ -3,8 +3,8 @@ module github.com/protobuf-orm/protoc-gen-orm-service
 go 1.24.5
 
 require (
-	github.com/iancoleman/strcase v0.3.0
-	github.com/protobuf-orm/protobuf-orm v0.0.0-20250727101530-cd9c2fcf952f
+	github.com/ettle/strcase v0.2.0
+	github.com/protobuf-orm/protobuf-orm v0.0.0-20250810091554-c9ce152f91bd
 	github.com/stretchr/testify v1.10.0
 	google.golang.org/protobuf v1.36.6
 )

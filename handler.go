@@ -24,6 +24,16 @@ func (h *Handler) Run(p *protogen.Plugin) error {
 		pluginpb.CodeGeneratorResponse_FEATURE_SUPPORTS_EDITIONS,
 	)
 
+	ctx := context.Background()
+	// TODO: set logger
+
+	g := graph.NewGraph()
+	for _, f := range p.Files {
+		if err := graph.Parse(ctx, g, f.Desc); err != nil {
+			return fmt.Errorf("parse entity at %s: %w", *f.Proto.Name, err)
+		}
+	}
+
 	opts := []app.Option{}
 	if h.Namer != "" {
 		v, err := template.New("namer").Parse(h.Namer)
@@ -36,16 +46,6 @@ func (h *Handler) Run(p *protogen.Plugin) error {
 	app, err := app.New(opts...)
 	if err != nil {
 		return fmt.Errorf("initialize plugin: %w", err)
-	}
-
-	ctx := context.Background()
-	// TODO: set logger
-
-	g := graph.NewGraph()
-	for _, f := range p.Files {
-		if err := graph.Parse(ctx, g, f.Desc); err != nil {
-			return fmt.Errorf("parse entity at %s: %w", *f.Proto.Name, err)
-		}
 	}
 
 	return app.Run(ctx, p, g)

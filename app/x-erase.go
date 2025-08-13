@@ -12,6 +12,6 @@ func (w *fileWork) xRpcErase() ast.Rpc {
 		ResponseType: w.useType("google/protobuf/empty.proto", "google.protobuf.Empty"),
 	}
 
-	w.defineRpc(v)
+	w.defineRpc(v, ast.Comment("Erase deletes a "+w.entity.Name()))
 	return v
 }

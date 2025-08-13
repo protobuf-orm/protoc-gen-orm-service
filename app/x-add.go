@@ -13,7 +13,7 @@ func (w *fileWork) xRpcAdd() ast.Rpc {
 		ResponseType: string(w.entity.FullName()),
 	}
 
-	w.defineRpc(v)
+	w.defineRpc(v, ast.Comment("Add creates a new "+w.entity.Name()))
 	return v
 }
 

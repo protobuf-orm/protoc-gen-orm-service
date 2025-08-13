@@ -13,7 +13,7 @@ func (w *fileWork) xRpcPatch() ast.Rpc {
 		ResponseType: w.useEntityType(w.entity),
 	}
 
-	w.defineRpc(v)
+	w.defineRpc(v, ast.Comment("Patch updates an existing "+w.entity.Name()))
 	return v
 }
 

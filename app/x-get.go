@@ -12,7 +12,7 @@ func (w *fileWork) xRpcGet() ast.Rpc {
 		ResponseType: w.useEntityType(w.entity),
 	}
 
-	w.defineRpc(v)
+	w.defineRpc(v, ast.Comment("Get retrieves a "+w.entity.Name()))
 	return v
 }
 

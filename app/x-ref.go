@@ -3,7 +3,7 @@ package app
 import (
 	"slices"
 
-	"github.com/iancoleman/strcase"
+	"github.com/ettle/strcase"
 	"github.com/protobuf-orm/protobuf-orm/graph"
 	"github.com/protobuf-orm/protoc-gen-orm-service/internal/ast"
 )
@@ -56,7 +56,7 @@ func (w *fileWork) xMsgRef() ast.Message {
 }
 
 func (w *fileWork) xMsgRefByIndex(index graph.Index) ast.Message {
-	return w.defineMsg("RefBy"+strcase.ToCamel(index.Name()), func(m *ast.Message) {
+	return w.defineMsg("RefBy"+strcase.ToPascal(index.Name()), func(m *ast.Message) {
 		for p := range index.Props() {
 			f := ast.MessageField{
 				Name:   string(p.FullName().Name()),
