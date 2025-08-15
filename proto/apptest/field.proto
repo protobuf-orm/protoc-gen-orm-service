@@ -2,11 +2,12 @@ edition = "2023";
 
 package apptest;
 
+import "apptest/user.proto";
 import "orm.proto";
 
 option go_package = "github.com/protobuf-orm/protoc-gen-orm-service/internal/apptest";
 
-message All {
+message Field {
   string id = 1 [(orm.field) = {key: true}];
 
   double implicit_f64 = 0x10 [features.field_presence = IMPLICIT];
@@ -40,6 +41,7 @@ message All {
   bool explicit_bool = 0x3C [features.field_presence = EXPLICIT];
   string explicit_string = 0x3D [features.field_presence = EXPLICIT];
   bytes explicit_bytes = 0x3E [features.field_presence = EXPLICIT];
+  User explicit_json = 0x3F [(orm.field) = {type: TYPE_JSON}];
 
   repeated double implicit_f64s = 0x50;
   repeated float implicit_f32s = 0x51;
@@ -56,6 +58,7 @@ message All {
   repeated bool implicit_bools = 0x5C;
   repeated string implicit_strings = 0x5D;
   repeated bytes implicit_bytess = 0x5E;
+  repeated User implicit_jsons = 0x5F [(orm.field) = {type: TYPE_JSON}];
 
   double nullable_f64 = 0x70 [(orm.field) = {nullable: true}];
   float nullable_f32 = 0x71 [(orm.field) = {nullable: true}];
@@ -72,6 +75,10 @@ message All {
   bool nullable_bool = 0x7C [(orm.field) = {nullable: true}];
   string nullable_string = 0x7D [(orm.field) = {nullable: true}];
   bytes nullable_bytes = 0x7E [(orm.field) = {nullable: true}];
+  User nullable_json = 0x7F [(orm.field) = {
+    type: TYPE_JSON
+    nullable: true
+  }];
 
   double implicit_f64_with_default = 0x90 [
     features.field_presence = IMPLICIT,
@@ -194,6 +201,10 @@ message All {
     features.field_presence = EXPLICIT,
     (orm.field) = {default: ""}
   ];
+  User explicit_json_with_default = 0xBF [(orm.field) = {
+    type: TYPE_JSON
+    default: ""
+  }];
 
   double implicit_immutable_f64 = 0xD0 [
     features.field_presence = IMPLICIT,
@@ -316,6 +327,10 @@ message All {
     features.field_presence = EXPLICIT,
     (orm.field) = {immutable: true}
   ];
+  User explicit_immutable_json = 0xFF [(orm.field) = {
+    type: TYPE_JSON
+    immutable: true
+  }];
 
   option (orm.message) = {
     rpc: {crud: true}

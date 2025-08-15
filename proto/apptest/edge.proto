@@ -1,0 +1,25 @@
+edition = "2023";
+
+package apptest;
+
+import "apptest/user.proto";
+import "orm.proto";
+
+option go_package = "github.com/protobuf-orm/protoc-gen-orm-service/internal/apptest";
+
+message Edge {
+  string id = 1 [(orm.field) = {key: true}];
+
+  User required = 0x10;
+  User nullable = 0x30 [(orm.edge) = {nullable: true}];
+
+  User required_immutable = 0xD0 [(orm.edge) = {immutable: true}];
+  User nullable_immutable = 0xF0 [(orm.edge) = {
+    nullable: true
+    immutable: true
+  }];
+
+  option (orm.message) = {
+    rpc: {crud: true}
+  };
+}

@@ -26,8 +26,12 @@ message TenantAddRequest {
 	bytes id = 1 [
 		features.field_presence = IMPLICIT
 	];
-	string alias = 4;
-	string name = 5;
+	string alias = 4 [
+		features.field_presence = IMPLICIT
+	];
+	string name = 5 [
+		features.field_presence = IMPLICIT
+	];
 	map<string,string> labels = 7;
 	google.protobuf.Timestamp date_created = 15;
 }

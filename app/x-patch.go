@@ -34,15 +34,15 @@ func (w *fileWork) xMsgPatch() ast.Message {
 				Name:   string(p.FullName().Name()),
 				Number: int(p.Number())*2 - 1,
 			}
-			switch u := p.(type) {
+			switch p := p.(type) {
 			case graph.Field:
-				t := w.useFieldType(u)
+				t := w.useFieldType(p)
 				f.Type = t
-				if u.IsList() {
+				if p.IsList() {
 					f.Label = ast.LabelRepeated
 				}
 			case graph.Edge:
-				t := w.withEntity(u.Target()).xMsgRef()
+				t := w.withEntity(p.Target()).xMsgRef()
 				f.Type = t.Name
 
 			default:
