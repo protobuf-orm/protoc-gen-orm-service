@@ -28,7 +28,7 @@ func TestMessage(t *testing.T) {
 				Name:   "name",
 				Number: 2,
 				Opts: []ast.FieldOption{
-					ast.FeaturesFieldPresenceImplicit,
+					ast.FeaturesFieldPresenceImplicit.WithinField(),
 					{
 						Name:  "my_option",
 						Value: ast.String("Django"),

@@ -4,12 +4,26 @@ import (
 	"fmt"
 )
 
+var (
+	FeaturesFieldPresenceImplicit = knownOption("features.field_presence", Value("IMPLICIT"))
+	FeaturesFieldPresenceExplicit = knownOption("features.field_presence", Value("EXPLICIT"))
+)
+
+func knownOption(name string, value Constant) Option {
+	return Option{
+		Known: true,
+		Name:  name,
+		Value: value,
+	}
+}
+
 type Option struct {
 	Known bool
 	Name  string
 	Value Constant
 
 	tagTopLevelDef
+	tagMessageBody
 	tagEnumBody
 }
 
@@ -26,25 +40,20 @@ func (v Option) PrintTo(p Printer) {
 	p.Newline()
 }
 
+func (o Option) WithinField() FieldOption {
+	return FieldOption{
+		Known: o.Known,
+		Name:  o.Name,
+		Value: o.Value,
+	}
+}
+
 type FieldOption struct {
 	Known bool
 	Name  string
 	Value Constant
 
 	tagEnumBody
-}
-
-var (
-	FeaturesFieldPresenceImplicit = knownFieldOption("features.field_presence", Value("IMPLICIT"))
-	FeaturesFieldPresenceExplicit = knownFieldOption("features.field_presence", Value("EXPLICIT"))
-)
-
-func knownFieldOption(name string, value Constant) FieldOption {
-	return FieldOption{
-		Known: true,
-		Name:  name,
-		Value: value,
-	}
 }
 
 func (v FieldOption) PrintTo(p Printer) {

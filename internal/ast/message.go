@@ -24,7 +24,7 @@ type tagMessageBody struct{}
 func (tagMessageBody) _messageBody() {}
 
 type MessageField struct {
-	Label  string
+	Label  Label
 	Type   string
 	Name   string
 	Number int
@@ -54,6 +54,13 @@ func (v MessageField) PrintTo(p Printer) {
 		p.Newline()
 	}
 }
+
+type Label string
+
+const (
+	LabelRepeated = "repeated"
+	LabelOptional = "optional"
+)
 
 type MessageOneof struct {
 	Name string

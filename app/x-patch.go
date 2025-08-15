@@ -38,6 +38,9 @@ func (w *fileWork) xMsgPatch() ast.Message {
 			case graph.Field:
 				t := w.useFieldType(u)
 				f.Type = t
+				if u.IsList() {
+					f.Label = ast.LabelRepeated
+				}
 			case graph.Edge:
 				t := w.withEntity(u.Target()).xMsgRef()
 				f.Type = t.Name

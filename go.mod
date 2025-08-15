@@ -4,7 +4,7 @@ go 1.24.5
 
 require (
 	github.com/ettle/strcase v0.2.0
-	github.com/protobuf-orm/protobuf-orm v0.0.0-20250810091554-c9ce152f91bd
+	github.com/protobuf-orm/protobuf-orm v0.0.0-20250815082521-01ec884edc8f
 	github.com/stretchr/testify v1.10.0
 	google.golang.org/protobuf v1.36.6
 )

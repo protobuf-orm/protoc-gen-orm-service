@@ -28,8 +28,10 @@ func (w *fileWork) xMsgAddRequest() ast.Message {
 			case graph.Field:
 				t := w.useFieldType(u)
 				f.Type = t
-				if u.IsOptional() && u.Type().IsScalar() {
-					f.Opts = append(f.Opts, ast.FeaturesFieldPresenceExplicit)
+				if u.IsList() {
+					f.Label = ast.LabelRepeated
+				} else if u.Type().IsScalar() && !u.IsOptional() {
+					f.Opts = append(f.Opts, ast.FeaturesFieldPresenceImplicit.WithinField())
 				}
 
 			case graph.Edge:
