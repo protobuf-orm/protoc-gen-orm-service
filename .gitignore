@@ -1,5 +1,6 @@
 /go.work
 /go.work.sum
 
-/internal/apptest/*.g.pb.go
+/internal/apptest/*
+!/internal/apptest/*_test.go
 /protoc-gen-orm-service
