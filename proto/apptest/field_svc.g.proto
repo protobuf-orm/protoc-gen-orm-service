@@ -6,23 +6,23 @@ edition = "2023";
 package apptest;
 
 import "apptest/field.proto";
-import "apptest/user.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
 
 option go_package = "github.com/protobuf-orm/protoc-gen-orm-service/internal/apptest";
 
-service FieldService {
-	// Add creates a new Field
-	rpc Add(FieldAddRequest) returns (Field);
-	// Get retrieves a Field
-	rpc Get(FieldGetRequest) returns (Field);
-	// Patch updates an existing Field
-	rpc Patch(FieldPatchRequest) returns (Field);
-	// Erase deletes a Field
-	rpc Erase(FieldRef) returns (google.protobuf.Empty);
+service ValueFieldService {
+	// Add creates a new ValueField
+	rpc Add(ValueFieldAddRequest) returns (ValueField);
+	// Get retrieves a ValueField
+	rpc Get(ValueFieldGetRequest) returns (ValueField);
+	// Patch updates an existing ValueField
+	rpc Patch(ValueFieldPatchRequest) returns (ValueField);
+	// Erase deletes a ValueField
+	rpc Erase(ValueFieldRef) returns (google.protobuf.Empty);
 }
 
-message FieldAddRequest {
+message ValueFieldAddRequest {
 	string id = 1;
 	double implicit_f64 = 16 [
 		features.field_presence = IMPLICIT
@@ -69,6 +69,7 @@ message FieldAddRequest {
 	bytes implicit_bytes = 30 [
 		features.field_presence = IMPLICIT
 	];
+	Level implicit_enum = 31;
 	double explicit_f64 = 48;
 	float explicit_f32 = 49;
 	int32 explicit_i32 = 50;
@@ -84,7 +85,7 @@ message FieldAddRequest {
 	bool explicit_bool = 60;
 	string explicit_string = 61;
 	bytes explicit_bytes = 62;
-	User explicit_json = 63;
+	Level explicit_enum = 63;
 	repeated double implicit_f64s = 80;
 	repeated float implicit_f32s = 81;
 	repeated int32 implicit_i32s = 82;
@@ -100,7 +101,7 @@ message FieldAddRequest {
 	repeated bool implicit_bools = 92;
 	repeated string implicit_strings = 93;
 	repeated bytes implicit_bytess = 94;
-	repeated User implicit_jsons = 95;
+	repeated Level implicit_levels = 95;
 	double nullable_f64 = 112;
 	float nullable_f32 = 113;
 	int32 nullable_i32 = 114;
@@ -116,52 +117,23 @@ message FieldAddRequest {
 	bool nullable_bool = 124;
 	string nullable_string = 125;
 	bytes nullable_bytes = 126;
-	User nullable_json = 127;
-	double implicit_f64_with_default = 144 [
-		features.field_presence = IMPLICIT
-	];
-	float implicit_f32_with_default = 145 [
-		features.field_presence = IMPLICIT
-	];
-	int32 implicit_i32_with_default = 146 [
-		features.field_presence = IMPLICIT
-	];
-	int64 implicit_i64_with_default = 147 [
-		features.field_presence = IMPLICIT
-	];
-	uint32 implicit_u32_with_default = 148 [
-		features.field_presence = IMPLICIT
-	];
-	uint64 implicit_u64_with_default = 149 [
-		features.field_presence = IMPLICIT
-	];
-	sint32 implicit_si32_with_default = 150 [
-		features.field_presence = IMPLICIT
-	];
-	sint64 implicit_si64_with_default = 151 [
-		features.field_presence = IMPLICIT
-	];
-	fixed32 implicit_fi32_with_default = 152 [
-		features.field_presence = IMPLICIT
-	];
-	fixed64 implicit_fi64_with_default = 153 [
-		features.field_presence = IMPLICIT
-	];
-	sfixed32 implicit_sfi32_with_default = 154 [
-		features.field_presence = IMPLICIT
-	];
-	sfixed64 implicit_sfi64_with_default = 155 [
-		features.field_presence = IMPLICIT
-	];
-	bool implicit_bool_with_default = 156 [
-		features.field_presence = IMPLICIT
-	];
-	string implicit_string_with_default = 157 [
-		features.field_presence = IMPLICIT
-	];
-	bytes implicit_bytes_with_default = 158 [
-		features.field_presence = IMPLICIT
-	];
+	Level nullable_level = 127;
+	double implicit_f64_with_default = 144;
+	float implicit_f32_with_default = 145;
+	int32 implicit_i32_with_default = 146;
+	int64 implicit_i64_with_default = 147;
+	uint32 implicit_u32_with_default = 148;
+	uint64 implicit_u64_with_default = 149;
+	sint32 implicit_si32_with_default = 150;
+	sint64 implicit_si64_with_default = 151;
+	fixed32 implicit_fi32_with_default = 152;
+	fixed64 implicit_fi64_with_default = 153;
+	sfixed32 implicit_sfi32_with_default = 154;
+	sfixed64 implicit_sfi64_with_default = 155;
+	bool implicit_bool_with_default = 156;
+	string implicit_string_with_default = 157;
+	bytes implicit_bytes_with_default = 158;
+	Level implicit_level_with_default = 159;
 	double explicit_f64_with_default = 176;
 	float explicit_f32_with_default = 177;
 	int32 explicit_i32_with_default = 178;
@@ -177,7 +149,7 @@ message FieldAddRequest {
 	bool explicit_bool_with_default = 188;
 	string explicit_string_with_default = 189;
 	bytes explicit_bytes_with_default = 190;
-	User explicit_json_with_default = 191;
+	Level explicit_level_with_default = 191;
 	double implicit_immutable_f64 = 208 [
 		features.field_presence = IMPLICIT
 	];
@@ -223,6 +195,7 @@ message FieldAddRequest {
 	bytes implicit_immutable_bytes = 222 [
 		features.field_presence = IMPLICIT
 	];
+	Level implicit_immutable_level = 223;
 	double explicit_immutable_f64 = 240;
 	float explicit_immutable_f32 = 241;
 	int32 explicit_immutable_i32 = 242;
@@ -238,16 +211,16 @@ message FieldAddRequest {
 	bool explicit_immutable_bool = 252;
 	string explicit_immutable_string = 253;
 	bytes explicit_immutable_bytes = 254;
-	User explicit_immutable_json = 255;
+	Level explicit_immutable_level = 255;
 }
 
-message FieldRef {
+message ValueFieldRef {
 	oneof key {
 		string id = 1;
 	}
 }
 
-message FieldSelect {
+message ValueFieldSelect {
 	bool all = 1;
 	bool implicit_f64 = 16;
 	bool implicit_f32 = 17;
@@ -264,6 +237,7 @@ message FieldSelect {
 	bool implicit_bool = 28;
 	bool implicit_string = 29;
 	bool implicit_bytes = 30;
+	bool implicit_enum = 31;
 	bool explicit_f64 = 48;
 	bool explicit_f32 = 49;
 	bool explicit_i32 = 50;
@@ -279,7 +253,7 @@ message FieldSelect {
 	bool explicit_bool = 60;
 	bool explicit_string = 61;
 	bool explicit_bytes = 62;
-	bool explicit_json = 63;
+	bool explicit_enum = 63;
 	bool implicit_f64s = 80;
 	bool implicit_f32s = 81;
 	bool implicit_i32s = 82;
@@ -295,7 +269,7 @@ message FieldSelect {
 	bool implicit_bools = 92;
 	bool implicit_strings = 93;
 	bool implicit_bytess = 94;
-	bool implicit_jsons = 95;
+	bool implicit_levels = 95;
 	bool nullable_f64 = 112;
 	bool nullable_f32 = 113;
 	bool nullable_i32 = 114;
@@ -311,7 +285,7 @@ message FieldSelect {
 	bool nullable_bool = 124;
 	bool nullable_string = 125;
 	bool nullable_bytes = 126;
-	bool nullable_json = 127;
+	bool nullable_level = 127;
 	bool implicit_f64_with_default = 144;
 	bool implicit_f32_with_default = 145;
 	bool implicit_i32_with_default = 146;
@@ -327,6 +301,7 @@ message FieldSelect {
 	bool implicit_bool_with_default = 156;
 	bool implicit_string_with_default = 157;
 	bool implicit_bytes_with_default = 158;
+	bool implicit_level_with_default = 159;
 	bool explicit_f64_with_default = 176;
 	bool explicit_f32_with_default = 177;
 	bool explicit_i32_with_default = 178;
@@ -342,7 +317,7 @@ message FieldSelect {
 	bool explicit_bool_with_default = 188;
 	bool explicit_string_with_default = 189;
 	bool explicit_bytes_with_default = 190;
-	bool explicit_json_with_default = 191;
+	bool explicit_level_with_default = 191;
 	bool implicit_immutable_f64 = 208;
 	bool implicit_immutable_f32 = 209;
 	bool implicit_immutable_i32 = 210;
@@ -358,6 +333,7 @@ message FieldSelect {
 	bool implicit_immutable_bool = 220;
 	bool implicit_immutable_string = 221;
 	bool implicit_immutable_bytes = 222;
+	bool implicit_immutable_level = 223;
 	bool explicit_immutable_f64 = 240;
 	bool explicit_immutable_f32 = 241;
 	bool explicit_immutable_i32 = 242;
@@ -373,16 +349,16 @@ message FieldSelect {
 	bool explicit_immutable_bool = 252;
 	bool explicit_immutable_string = 253;
 	bool explicit_immutable_bytes = 254;
-	bool explicit_immutable_json = 255;
+	bool explicit_immutable_level = 255;
 }
 
-message FieldGetRequest {
-	FieldRef ref = 1;
-	FieldSelect select = 2;
+message ValueFieldGetRequest {
+	ValueFieldRef ref = 1;
+	ValueFieldSelect select = 2;
 }
 
-message FieldPatchRequest {
-	FieldRef target = 1;
+message ValueFieldPatchRequest {
+	ValueFieldRef target = 1;
 	double implicit_f64 = 31;
 	float implicit_f32 = 33;
 	int32 implicit_i32 = 35;
@@ -398,6 +374,7 @@ message FieldPatchRequest {
 	bool implicit_bool = 55;
 	string implicit_string = 57;
 	bytes implicit_bytes = 59;
+	Level implicit_enum = 61;
 	double explicit_f64 = 95;
 	bool explicit_f64_null = 96;
 	float explicit_f32 = 97;
@@ -428,8 +405,8 @@ message FieldPatchRequest {
 	bool explicit_string_null = 122;
 	bytes explicit_bytes = 123;
 	bool explicit_bytes_null = 124;
-	User explicit_json = 125;
-	bool explicit_json_null = 126;
+	Level explicit_enum = 125;
+	bool explicit_enum_null = 126;
 	repeated double implicit_f64s = 159;
 	repeated float implicit_f32s = 161;
 	repeated int32 implicit_i32s = 163;
@@ -445,7 +422,7 @@ message FieldPatchRequest {
 	repeated bool implicit_bools = 183;
 	repeated string implicit_strings = 185;
 	repeated bytes implicit_bytess = 187;
-	repeated User implicit_jsons = 189;
+	repeated Level implicit_levels = 189;
 	double nullable_f64 = 223;
 	bool nullable_f64_null = 224;
 	float nullable_f32 = 225;
@@ -476,8 +453,8 @@ message FieldPatchRequest {
 	bool nullable_string_null = 250;
 	bytes nullable_bytes = 251;
 	bool nullable_bytes_null = 252;
-	User nullable_json = 253;
-	bool nullable_json_null = 254;
+	Level nullable_level = 253;
+	bool nullable_level_null = 254;
 	double implicit_f64_with_default = 287;
 	float implicit_f32_with_default = 289;
 	int32 implicit_i32_with_default = 291;
@@ -493,6 +470,7 @@ message FieldPatchRequest {
 	bool implicit_bool_with_default = 311;
 	string implicit_string_with_default = 313;
 	bytes implicit_bytes_with_default = 315;
+	Level implicit_level_with_default = 317;
 	double explicit_f64_with_default = 351;
 	bool explicit_f64_with_default_null = 352;
 	float explicit_f32_with_default = 353;
@@ -523,6 +501,115 @@ message FieldPatchRequest {
 	bool explicit_string_with_default_null = 378;
 	bytes explicit_bytes_with_default = 379;
 	bool explicit_bytes_with_default_null = 380;
-	User explicit_json_with_default = 381;
-	bool explicit_json_with_default_null = 382;
+	Level explicit_level_with_default = 381;
+	bool explicit_level_with_default_null = 382;
+}
+
+service MessageFieldService {
+	// Add creates a new MessageField
+	rpc Add(MessageFieldAddRequest) returns (MessageField);
+	// Get retrieves a MessageField
+	rpc Get(MessageFieldGetRequest) returns (MessageField);
+	// Patch updates an existing MessageField
+	rpc Patch(MessageFieldPatchRequest) returns (MessageField);
+	// Erase deletes a MessageField
+	rpc Erase(MessageFieldRef) returns (google.protobuf.Empty);
+}
+
+message MessageFieldAddRequest {
+	string id = 1;
+	google.protobuf.Struct explicit = 48;
+	repeated google.protobuf.Struct repeated = 80;
+	google.protobuf.Struct nullable = 112;
+	google.protobuf.Struct explicit_with_default = 176;
+	google.protobuf.Struct explicit_immutable = 240;
+}
+
+message MessageFieldRef {
+	oneof key {
+		string id = 1;
+	}
+}
+
+message MessageFieldSelect {
+	bool all = 1;
+	bool explicit = 48;
+	bool repeated = 80;
+	bool nullable = 112;
+	bool explicit_with_default = 176;
+	bool explicit_immutable = 240;
+}
+
+message MessageFieldGetRequest {
+	MessageFieldRef ref = 1;
+	MessageFieldSelect select = 2;
+}
+
+message MessageFieldPatchRequest {
+	MessageFieldRef target = 1;
+	google.protobuf.Struct explicit = 95;
+	bool explicit_null = 96;
+	repeated google.protobuf.Struct repeated = 159;
+	google.protobuf.Struct nullable = 223;
+	bool nullable_null = 224;
+	google.protobuf.Struct explicit_with_default = 351;
+	bool explicit_with_default_null = 352;
+}
+
+service MapFieldService {
+	// Add creates a new MapField
+	rpc Add(MapFieldAddRequest) returns (MapField);
+	// Get retrieves a MapField
+	rpc Get(MapFieldGetRequest) returns (MapField);
+	// Patch updates an existing MapField
+	rpc Patch(MapFieldPatchRequest) returns (MapField);
+	// Erase deletes a MapField
+	rpc Erase(MapFieldRef) returns (google.protobuf.Empty);
+}
+
+message MapFieldAddRequest {
+	string id = 1;
+	map<string,string> implicit_string = 16;
+	map<string,apptest.Level> implicit_enum = 17;
+	map<string,google.protobuf.Struct> implicit_json = 18;
+	map<string,string> implicit_string_with_default = 144;
+	map<string,apptest.Level> implicit_enum_with_default = 145;
+	map<string,google.protobuf.Struct> implicit_json_with_default = 146;
+	map<string,string> implicit_immutable_string = 208;
+	map<string,apptest.Level> implicit_immutable_enum = 209;
+	map<string,google.protobuf.Struct> implicit_immutable_json = 210;
+}
+
+message MapFieldRef {
+	oneof key {
+		string id = 1;
+	}
+}
+
+message MapFieldSelect {
+	bool all = 1;
+	bool implicit_string = 16;
+	bool implicit_enum = 17;
+	bool implicit_json = 18;
+	bool implicit_string_with_default = 144;
+	bool implicit_enum_with_default = 145;
+	bool implicit_json_with_default = 146;
+	bool implicit_immutable_string = 208;
+	bool implicit_immutable_enum = 209;
+	bool implicit_immutable_json = 210;
+}
+
+message MapFieldGetRequest {
+	MapFieldRef ref = 1;
+	MapFieldSelect select = 2;
+}
+
+message MapFieldPatchRequest {
+	MapFieldRef target = 1;
+	map<string,string> implicit_string = 31;
+	map<string,apptest.Level> implicit_enum = 33;
+	map<string,google.protobuf.Struct> implicit_json = 35;
+	map<string,string> implicit_string_with_default = 287;
+	map<string,apptest.Level> implicit_enum_with_default = 289;
+	map<string,google.protobuf.Struct> implicit_json_with_default = 291;
 }

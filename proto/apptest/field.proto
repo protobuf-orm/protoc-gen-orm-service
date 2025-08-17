@@ -2,12 +2,20 @@ edition = "2023";
 
 package apptest;
 
-import "apptest/user.proto";
+import "google/protobuf/struct.proto";
 import "orm.proto";
 
 option go_package = "github.com/protobuf-orm/protoc-gen-orm-service/internal/apptest";
 
-message Field {
+enum Level {
+  LEVEL_UNSPECIFIED = 0;
+
+  LEVEL_EASY = 1;
+  LEVEL_NORM = 2;
+  LEVEL_HARD = 3;
+}
+
+message ValueField {
   string id = 1 [(orm.field) = {key: true}];
 
   double implicit_f64 = 0x10 [features.field_presence = IMPLICIT];
@@ -25,6 +33,7 @@ message Field {
   bool implicit_bool = 0x1C [features.field_presence = IMPLICIT];
   string implicit_string = 0x1D [features.field_presence = IMPLICIT];
   bytes implicit_bytes = 0x1E [features.field_presence = IMPLICIT];
+  Level implicit_enum = 0x1F [features.field_presence = IMPLICIT];
 
   double explicit_f64 = 0x30 [features.field_presence = EXPLICIT];
   float explicit_f32 = 0x31 [features.field_presence = EXPLICIT];
@@ -41,7 +50,7 @@ message Field {
   bool explicit_bool = 0x3C [features.field_presence = EXPLICIT];
   string explicit_string = 0x3D [features.field_presence = EXPLICIT];
   bytes explicit_bytes = 0x3E [features.field_presence = EXPLICIT];
-  User explicit_json = 0x3F [(orm.field) = {type: TYPE_JSON}];
+  Level explicit_enum = 0x3F [features.field_presence = EXPLICIT];
 
   repeated double implicit_f64s = 0x50;
   repeated float implicit_f32s = 0x51;
@@ -58,7 +67,7 @@ message Field {
   repeated bool implicit_bools = 0x5C;
   repeated string implicit_strings = 0x5D;
   repeated bytes implicit_bytess = 0x5E;
-  repeated User implicit_jsons = 0x5F [(orm.field) = {type: TYPE_JSON}];
+  repeated Level implicit_levels = 0x5F;
 
   double nullable_f64 = 0x70 [(orm.field) = {nullable: true}];
   float nullable_f32 = 0x71 [(orm.field) = {nullable: true}];
@@ -75,10 +84,7 @@ message Field {
   bool nullable_bool = 0x7C [(orm.field) = {nullable: true}];
   string nullable_string = 0x7D [(orm.field) = {nullable: true}];
   bytes nullable_bytes = 0x7E [(orm.field) = {nullable: true}];
-  User nullable_json = 0x7F [(orm.field) = {
-    type: TYPE_JSON
-    nullable: true
-  }];
+  Level nullable_level = 0x7F [(orm.field) = {nullable: true}];
 
   double implicit_f64_with_default = 0x90 [
     features.field_presence = IMPLICIT,
@@ -137,6 +143,10 @@ message Field {
     (orm.field) = {default: ""}
   ];
   bytes implicit_bytes_with_default = 0x9E [
+    features.field_presence = IMPLICIT,
+    (orm.field) = {default: ""}
+  ];
+  Level implicit_level_with_default = 0x9F [
     features.field_presence = IMPLICIT,
     (orm.field) = {default: ""}
   ];
@@ -201,10 +211,10 @@ message Field {
     features.field_presence = EXPLICIT,
     (orm.field) = {default: ""}
   ];
-  User explicit_json_with_default = 0xBF [(orm.field) = {
-    type: TYPE_JSON
-    default: ""
-  }];
+  Level explicit_level_with_default = 0xBF [
+    features.field_presence = EXPLICIT,
+    (orm.field) = {default: ""}
+  ];
 
   double implicit_immutable_f64 = 0xD0 [
     features.field_presence = IMPLICIT,
@@ -263,6 +273,10 @@ message Field {
     (orm.field) = {immutable: true}
   ];
   bytes implicit_immutable_bytes = 0xDE [
+    features.field_presence = IMPLICIT,
+    (orm.field) = {immutable: true}
+  ];
+  Level implicit_immutable_level = 0xDF [
     features.field_presence = IMPLICIT,
     (orm.field) = {immutable: true}
   ];
@@ -327,10 +341,44 @@ message Field {
     features.field_presence = EXPLICIT,
     (orm.field) = {immutable: true}
   ];
-  User explicit_immutable_json = 0xFF [(orm.field) = {
-    type: TYPE_JSON
-    immutable: true
-  }];
+  Level explicit_immutable_level = 0xFF [
+    features.field_presence = EXPLICIT,
+    (orm.field) = {immutable: true}
+  ];
+
+  option (orm.message) = {
+    rpc: {crud: true}
+  };
+}
+
+message MessageField {
+  string id = 1 [(orm.field) = {key: true}];
+
+  google.protobuf.Struct explicit = 0x30;
+  repeated google.protobuf.Struct repeated = 0x50;
+  google.protobuf.Struct nullable = 0x70 [(orm.field) = {nullable: true}];
+  google.protobuf.Struct explicit_with_default = 0xB0 [(orm.field) = {default: ""}];
+  google.protobuf.Struct explicit_immutable = 0xF0 [(orm.field) = {immutable: true}];
+
+  option (orm.message) = {
+    rpc: {crud: true}
+  };
+}
+
+message MapField {
+  string id = 1 [(orm.field) = {key: true}];
+
+  map<string, string> implicit_string = 0x10;
+  map<string, Level> implicit_enum = 0x11;
+  map<string, google.protobuf.Struct> implicit_json = 0x12;
+
+  map<string, string> implicit_string_with_default = 0x90 [(orm.field) = {default: ""}];
+  map<string, Level> implicit_enum_with_default = 0x91 [(orm.field) = {default: ""}];
+  map<string, google.protobuf.Struct> implicit_json_with_default = 0x92 [(orm.field) = {default: ""}];
+
+  map<string, string> implicit_immutable_string = 0xD0 [(orm.field) = {immutable: true}];
+  map<string, Level> implicit_immutable_enum = 0xD1 [(orm.field) = {immutable: true}];
+  map<string, google.protobuf.Struct> implicit_immutable_json = 0xD2 [(orm.field) = {immutable: true}];
 
   option (orm.message) = {
     rpc: {crud: true}

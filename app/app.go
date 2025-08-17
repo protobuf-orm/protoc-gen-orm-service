@@ -10,6 +10,7 @@ import (
 	"text/template"
 
 	"github.com/protobuf-orm/protobuf-orm/graph"
+	"github.com/protobuf-orm/protoc-gen-orm-service/internal/ast"
 	"google.golang.org/protobuf/compiler/protogen"
 )
 
@@ -42,25 +43,41 @@ func (a *App) Run(ctx context.Context, p *protogen.Plugin, g *graph.Graph) error
 
 	w := newWork()
 	for _, f := range p.Files {
+		if !f.Generate {
+			continue
+		}
+
+		gf, path, err := a.newGeneratedFile(p, f)
+		if err != nil {
+			handle_err(err)
+			continue
+		}
+
+		var pf *ast.File
 		for _, m := range f.Messages {
 			entity, ok := g.Entities[m.Desc.FullName()]
 			if !ok {
 				continue
 			}
 
-			gf, path, err := a.newGeneratedFile(p, f)
-			if err != nil {
-				handle_err(err)
-				continue
-			}
-
 			w.paths[string(entity.FullName())] = path
 
-			if err := w.run(ctx, f, gf, entity); err != nil {
+			pf = w.newFile(f, entity)
+			if err := w.run(ctx, pf, entity); err != nil {
 				handle_err(err)
 				continue
 			}
 		}
+		if pf == nil {
+			// No entities in the file.
+			gf.Skip()
+			continue
+		}
+
+		pf.Imports = unique(pf.Imports)
+
+		p := ast.NewPrinter(gf, pf.Package)
+		pf.PrintTo(p)
 	}
 	if !ok {
 		return errors.New("some tasks are failed")
@@ -93,4 +110,16 @@ func (a *App) newGeneratedFile(p *protogen.Plugin, f *protogen.File) (*protogen.
 	gf.P("")
 
 	return gf, path, nil
+}
+
+func unique[T comparable](input []T) []T {
+	seen := make(map[T]struct{})
+	result := make([]T, 0, len(input))
+	for _, v := range input {
+		if _, ok := seen[v]; !ok {
+			seen[v] = struct{}{}
+			result = append(result, v)
+		}
+	}
+	return result
 }

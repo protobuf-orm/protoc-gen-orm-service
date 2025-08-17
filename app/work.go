@@ -20,6 +20,9 @@ type work struct {
 	// e.g. "google.protobuf.Timestamp" -> "google/protobuf/timestamp.proto"
 	imports map[string]string
 	msgs    map[string]ast.Message
+
+	// path to source proto file -> file structure
+	files map[string]*ast.File
 }
 
 func newWork() *work {
@@ -28,6 +31,8 @@ func newWork() *work {
 
 		imports: map[string]string{},
 		msgs:    map[string]ast.Message{},
+
+		files: map[string]*ast.File{},
 	}
 }
 
@@ -58,6 +63,35 @@ func (w *work) newFileWork(entity graph.Entity) *fileWork {
 	w.msgs[string(entity.FullName())] = ast.Message{}
 
 	return fw
+}
+
+func (w *work) newFile(src *protogen.File, entity graph.Entity) *ast.File {
+	path := src.Desc.Path()
+	f, ok := w.files[path]
+	if ok {
+		if f.Package != entity.Package() {
+			panic("entities are not in the same file")
+		}
+
+		return f
+	}
+
+	f = &ast.File{
+		Edition: ast.Edition2023,
+		Package: string(entity.Package()),
+		// TODO: copy options from the `src`?
+		Options: []ast.Option{
+			{
+				Known: true,
+				Name:  "go_package",
+				Value: ast.String(src.GoImportPath),
+			},
+		},
+		Defs: []ast.TopLevelDef{},
+	}
+	w.files[path] = f
+
+	return f
 }
 
 func (w *work) mustGetPath(v graph.Entity) string {
@@ -142,7 +176,7 @@ func (w *fileWork) defineRpc(v ast.Rpc, comment ast.Comment) {
 	w.rpcs = append(w.rpcs, v)
 }
 
-func (w *work) run(ctx context.Context, src *protogen.File, gf *protogen.GeneratedFile, entity graph.Entity) error {
+func (w *work) run(ctx context.Context, f *ast.File, entity graph.Entity) error {
 	fw := w.newFileWork(entity)
 
 	rpcs := entity.Rpcs()
@@ -159,34 +193,15 @@ func (w *work) run(ctx context.Context, src *protogen.File, gf *protogen.Generat
 		fw.xRpcErase()
 	}
 
-	// TODO: do not write a file here.
-	// it can be duplicated if there are two or more entities in the same file.
-	f := ast.File{
-		Edition: ast.Edition2023,
-		Package: string(entity.Package()),
-		// TODO: copy options from the `src`?
-		Options: []ast.Option{
-			{
-				Known: true,
-				Name:  "go_package",
-				Value: ast.String(src.GoImportPath),
-			},
-		},
-		Defs: []ast.TopLevelDef{
-			ast.Service{
-				Name: string(entity.FullName().Name()) + "Service",
-				Body: fw.rpcs,
-			},
-		},
-	}
+	f.Defs = append(f.Defs, ast.Service{
+		Name: string(entity.FullName().Name()) + "Service",
+		Body: fw.rpcs,
+	})
 
 	imports := slices.Collect(maps.Values(fw.imports))
 	slices.SortFunc(imports, strings.Compare)
-	imports = slices.Compact(imports)
 	for _, v := range imports {
-		f.Imports = append(f.Imports, ast.Import{
-			Name: v,
-		})
+		f.Imports = append(f.Imports, ast.Import{Name: v})
 	}
 
 	for _, name := range fw.names {
@@ -196,9 +211,6 @@ func (w *work) run(ctx context.Context, src *protogen.File, gf *protogen.Generat
 		}
 		f.Defs = append(f.Defs, v)
 	}
-
-	p := ast.NewPrinter(gf, f.Package)
-	f.PrintTo(p)
 
 	return nil
 }

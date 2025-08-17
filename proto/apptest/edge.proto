@@ -10,7 +10,7 @@ option go_package = "github.com/protobuf-orm/protoc-gen-orm-service/internal/app
 message Edge {
   string id = 1 [(orm.field) = {key: true}];
 
-  User required = 0x10;
+  User required = 0x10 [(orm.edge) = {}];
   User nullable = 0x30 [(orm.edge) = {nullable: true}];
 
   User required_immutable = 0xD0 [(orm.edge) = {immutable: true}];
