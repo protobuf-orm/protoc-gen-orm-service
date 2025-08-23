@@ -164,7 +164,7 @@ func (w *fileWork) defineMsg(name string, f func(m *ast.Message)) ast.Message {
 	return m
 }
 
-func (w *fileWork) defineRpc(v ast.Rpc, comment ast.Comment) {
+func (w *fileWork) defineRpc(comment ast.Comment, v ast.Rpc) ast.Rpc {
 	if _, ok := w.root.imports[v.RequestType]; !ok {
 		panic(fmt.Sprintf("request type not found: %s", v.RequestType))
 	}
@@ -174,6 +174,8 @@ func (w *fileWork) defineRpc(v ast.Rpc, comment ast.Comment) {
 
 	w.rpcs = append(w.rpcs, comment)
 	w.rpcs = append(w.rpcs, v)
+
+	return v
 }
 
 func (w *work) run(ctx context.Context, f *ast.File, entity graph.Entity) error {
@@ -194,7 +196,7 @@ func (w *work) run(ctx context.Context, f *ast.File, entity graph.Entity) error 
 	}
 
 	f.Defs = append(f.Defs, ast.Service{
-		Name: string(entity.FullName().Name()) + "Service",
+		Name: entity.Name() + "Service",
 		Body: fw.rpcs,
 	})
 

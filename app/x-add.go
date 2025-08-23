@@ -6,40 +6,39 @@ import (
 )
 
 func (w *fileWork) xRpcAdd() ast.Rpc {
-	req := w.xMsgAddRequest()
-	v := ast.Rpc{
-		Name:         "Add",
-		RequestType:  req.Name,
-		ResponseType: string(w.entity.FullName()),
-	}
-
-	w.defineRpc(v, ast.Comment("Add creates a new "+w.entity.Name()))
-	return v
+	return w.defineRpc(
+		ast.Comment("Add creates a new "+w.entity.Name()),
+		ast.Rpc{
+			Name:         "Add",
+			RequestType:  w.xMsgAddRequest().Name,
+			ResponseType: w.useEntityType(w.entity),
+		},
+	)
 }
 
 func (w *fileWork) xMsgAddRequest() ast.Message {
 	return w.defineMsg("AddRequest", func(m *ast.Message) {
 		for p := range w.entity.Props() {
 			f := ast.MessageField{
-				Name:   string(p.FullName().Name()),
+				Name:   p.Name(),
 				Number: int(p.Number()),
 			}
-			switch u := p.(type) {
+			if p.IsList() {
+				f.Label = ast.LabelRepeated
+			}
+
+			switch p := p.(type) {
 			case graph.Field:
-				t := w.useFieldType(u)
-				f.Type = t
-				if u.IsList() {
-					f.Label = ast.LabelRepeated
-				} else if u.Type().IsScalar() && !u.IsOptional() {
+				f.Type = w.useFieldType(p)
+				if !p.IsList() && p.Type().IsScalar() && !p.IsOptional() {
 					f.Opts = append(f.Opts, ast.FeaturesFieldPresenceImplicit.WithinField())
 				}
 
 			case graph.Edge:
-				t := w.withEntity(u.Target()).xMsgRef()
-				f.Type = t.Name
+				f.Type = w.withEntity(p.Target()).xMsgRef().Name
 
 			default:
-				panic("unknown type of graph prop")
+				panic(errUnknownPropType)
 			}
 			m.Body = append(m.Body, f)
 		}

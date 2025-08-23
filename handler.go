@@ -28,10 +28,8 @@ func (h *Handler) Run(p *protogen.Plugin) error {
 	// TODO: set logger
 
 	g := graph.NewGraph()
-	for _, f := range p.Files {
-		if err := graph.Parse(ctx, g, f.Desc); err != nil {
-			return fmt.Errorf("parse entity at %s: %w", *f.Proto.Name, err)
-		}
+	if err := graph.ParseFiles(ctx, g, p.Files); err != nil {
+		return fmt.Errorf("parse entities: %w", err)
 	}
 
 	opts := []app.Option{}

@@ -15,14 +15,14 @@ func (w *fileWork) xMsgSelect() ast.Message {
 
 			m.Body = append(m.Body, ast.MessageField{
 				Type:   t,
-				Name:   string(p.FullName().Name()),
+				Name:   p.Name(),
 				Number: int(p.Number()),
 			})
 		}
 
 		k := w.entity.Key()
-		for i, f_ := range m.Body {
-			f := f_.(ast.MessageField)
+		for i, f := range m.Body {
+			f := f.(ast.MessageField)
 			if f.Number != int(k.Number()) {
 				continue
 			}

@@ -6,15 +6,14 @@ import (
 )
 
 func (w *fileWork) xRpcPatch() ast.Rpc {
-	req := w.xMsgPatch()
-	v := ast.Rpc{
-		Name:         "Patch",
-		RequestType:  req.Name,
-		ResponseType: w.useEntityType(w.entity),
-	}
-
-	w.defineRpc(v, ast.Comment("Patch updates an existing "+w.entity.Name()))
-	return v
+	return w.defineRpc(
+		ast.Comment("Patch updates an existing "+w.entity.Name()),
+		ast.Rpc{
+			Name:         "Patch",
+			RequestType:  w.xMsgPatch().Name,
+			ResponseType: w.useEntityType(w.entity),
+		},
+	)
 }
 
 func (w *fileWork) xMsgPatch() ast.Message {
@@ -31,29 +30,29 @@ func (w *fileWork) xMsgPatch() ast.Message {
 			}
 
 			f := ast.MessageField{
-				Name:   string(p.FullName().Name()),
+				Name:   p.Name(),
 				Number: int(p.Number())*2 - 1,
 			}
+			if p.Descriptor().IsList() {
+				f.Label = ast.LabelRepeated
+			}
+
 			switch p := p.(type) {
 			case graph.Field:
-				t := w.useFieldType(p)
-				f.Type = t
-				if p.IsList() {
-					f.Label = ast.LabelRepeated
-				}
+				f.Type = w.useFieldType(p)
+
 			case graph.Edge:
-				t := w.withEntity(p.Target()).xMsgRef()
-				f.Type = t.Name
+				f.Type = w.withEntity(p.Target()).xMsgRef().Name
 
 			default:
-				panic("unknown type of graph prop")
+				panic(errUnknownPropType)
 			}
 			m.Body = append(m.Body, f)
 
 			if p.IsNullable() {
 				m.Body = append(m.Body, ast.MessageField{
 					Type:   "bool",
-					Name:   string(p.FullName().Name()) + "_null",
+					Name:   p.Name() + "_null",
 					Number: int(p.Number()) * 2,
 				})
 			}

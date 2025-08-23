@@ -11,32 +11,25 @@ import (
 func (w *fileWork) xMsgRef() ast.Message {
 	return w.defineMsg("Ref", func(m *ast.Message) {
 		fs := []ast.MessageOneofField{}
-		for v := range w.entity.Fields() {
-			if !v.IsUnique() {
-				continue
-			}
-
-			t := w.useFieldType(v)
-			fs = append(fs, ast.MessageOneofField{
-				Type:   t,
-				Name:   string(v.FullName().Name()),
-				Number: int(v.Number()),
-			})
-		}
-		for v := range w.entity.Indexes() {
-			if !v.IsUnique() {
-				continue
-			}
-
+		for p := range w.entity.Keys() {
 			f := ast.MessageOneofField{
-				Type: w.xMsgRefByIndex(v).Name,
-				Name: v.Name(),
+				Name:   p.Name(),
+				Number: int(p.Number()),
 			}
-			v.Props()(func(v graph.Prop) bool {
-				f.Number = int(v.Number())
-				return false
-			})
 
+			switch p := p.(type) {
+			case graph.Field:
+				f.Type = w.useFieldType(p)
+
+			case graph.Edge:
+				panic("edge key not implemented")
+
+			case graph.Index:
+				f.Type = w.xMsgRefByIndex(p).Name
+
+			default:
+				panic(errUnknownPropType)
+			}
 			fs = append(fs, f)
 		}
 
@@ -59,19 +52,19 @@ func (w *fileWork) xMsgRefByIndex(index graph.Index) ast.Message {
 	return w.defineMsg("RefBy"+strcase.ToPascal(index.Name()), func(m *ast.Message) {
 		for p := range index.Props() {
 			f := ast.MessageField{
-				Name:   string(p.FullName().Name()),
+				Name:   p.Name(),
 				Number: int(p.Number()),
 			}
+
 			switch u := p.(type) {
 			case graph.Field:
-				t := w.useFieldType(u)
-				f.Type = t
+				f.Type = w.useFieldType(u)
+
 			case graph.Edge:
-				t := w.withEntity(u.Target()).xMsgRef()
-				f.Type = t.Name
+				f.Type = w.withEntity(u.Target()).xMsgRef().Name
 
 			default:
-				panic("unknown type of graph prop")
+				panic(errUnknownPropType)
 			}
 			m.Body = append(m.Body, f)
 		}

@@ -5,13 +5,12 @@ import (
 )
 
 func (w *fileWork) xRpcErase() ast.Rpc {
-	req := w.xMsgRef()
-	v := ast.Rpc{
-		Name:         "Erase",
-		RequestType:  req.Name,
-		ResponseType: w.useType("google/protobuf/empty.proto", "google.protobuf.Empty"),
-	}
-
-	w.defineRpc(v, ast.Comment("Erase deletes a "+w.entity.Name()))
-	return v
+	return w.defineRpc(
+		ast.Comment("Erase deletes a "+w.entity.Name()),
+		ast.Rpc{
+			Name:         "Erase",
+			RequestType:  w.xMsgRef().Name,
+			ResponseType: w.useType("google/protobuf/empty.proto", "google.protobuf.Empty"),
+		},
+	)
 }

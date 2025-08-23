@@ -5,15 +5,14 @@ import (
 )
 
 func (w *fileWork) xRpcGet() ast.Rpc {
-	req := w.xMsgGet()
-	v := ast.Rpc{
-		Name:         "Get",
-		RequestType:  req.Name,
-		ResponseType: w.useEntityType(w.entity),
-	}
-
-	w.defineRpc(v, ast.Comment("Get retrieves a "+w.entity.Name()))
-	return v
+	return w.defineRpc(
+		ast.Comment("Get retrieves a "+w.entity.Name()),
+		ast.Rpc{
+			Name:         "Get",
+			RequestType:  w.xMsgGet().Name,
+			ResponseType: w.useEntityType(w.entity),
+		},
+	)
 }
 
 func (w *fileWork) xMsgGet() ast.Message {
