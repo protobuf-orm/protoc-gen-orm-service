@@ -19,6 +19,9 @@ message User {
   string name = 5 [(orm.field) = {default: ""}];
   map<string, string> labels = 7;
 
+  google.protobuf.Timestamp date_updated = 14 [(orm.field) = {
+    version: {}
+  }];
   google.protobuf.Timestamp date_created = 15 [(orm.field) = {
     immutable: true
     default: ""

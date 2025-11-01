@@ -37,9 +37,11 @@ func (w *fileWork) xMsgPatch() ast.Message {
 				f.Label = ast.LabelRepeated
 			}
 
+			is_version := false
 			switch p := p.(type) {
 			case graph.Field:
 				f.Type = w.useFieldType(p)
+				is_version = p.IsVersion()
 
 			case graph.Edge:
 				f.Type = w.withEntity(p.Target()).xMsgRef().Name
@@ -49,7 +51,14 @@ func (w *fileWork) xMsgPatch() ast.Message {
 			}
 			m.Body = append(m.Body, f)
 
-			if p.IsNullable() {
+			switch {
+			case is_version:
+				m.Body = append(m.Body, ast.MessageField{
+					Type:   "bool",
+					Name:   p.Name() + "_force",
+					Number: int(p.Number()) * 2,
+				})
+			case p.IsNullable():
 				m.Body = append(m.Body, ast.MessageField{
 					Type:   "bool",
 					Name:   p.Name() + "_null",
