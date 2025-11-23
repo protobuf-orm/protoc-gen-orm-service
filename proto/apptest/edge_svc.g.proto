@@ -50,7 +50,7 @@ message EdgeGetRequest {
 }
 
 message EdgePatchRequest {
-	EdgeRef target = 1;
+	EdgeRef ref = 1;
 	UserRef required = 31;
 	UserRef nullable = 95;
 	bool nullable_null = 96;

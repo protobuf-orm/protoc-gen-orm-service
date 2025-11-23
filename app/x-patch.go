@@ -20,7 +20,7 @@ func (w *fileWork) xMsgPatch() ast.Message {
 	return w.defineMsg("PatchRequest", func(m *ast.Message) {
 		m.Body = append(m.Body, ast.MessageField{
 			Type:   w.xMsgRef().Name,
-			Name:   "target",
+			Name:   "ref",
 			Number: int(w.entity.Key().Number()),
 		})
 

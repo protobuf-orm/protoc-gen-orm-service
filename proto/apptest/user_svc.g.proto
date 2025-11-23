@@ -62,7 +62,7 @@ message UserGetRequest {
 }
 
 message UserPatchRequest {
-	UserRef target = 1;
+	UserRef ref = 1;
 	Tenant tenant = 3;
 	bool tenant_null = 4;
 	string alias = 7;
