@@ -5,6 +5,9 @@ import "fmt"
 type Enum struct {
 	Name string
 	Body []EnumBody
+
+	// An enum may be declared at file scope, like a message or service.
+	tagTopLevelDef
 }
 
 func (v Enum) PrintTo(p Printer) {

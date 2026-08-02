@@ -62,11 +62,15 @@ func (p *printer) Write(b []byte) (n int, err error) {
 }
 
 func (p *printer) PrintTypename(v string) {
-	name, ok := strings.CutPrefix(v, p.pkg)
-	if ok {
-		name = name[1:]
-	} else {
-		name = v
+	// Strip the local package prefix so a type defined in this file is printed
+	// unqualified. Match on the full "pkg." boundary: this avoids slicing an
+	// empty string (when v == pkg), mangling names when pkg is empty, and
+	// trimming a partial-prefix match (e.g. pkg "lib" vs type "library.X").
+	name := v
+	if p.pkg != "" {
+		if rest, ok := strings.CutPrefix(v, p.pkg+"."); ok {
+			name = rest
+		}
 	}
 	p.Write([]byte(name))
 }

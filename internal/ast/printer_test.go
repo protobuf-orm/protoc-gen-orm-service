@@ -8,6 +8,33 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Enum is a top-level definition, like Message and Service.
+var _ ast.TopLevelDef = ast.Enum{}
+
+func TestPrintTypename(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		pkg  string
+		in   string
+		want string
+	}{
+		{"strips local package", "orm.test", "orm.test.User", "User"},
+		{"keeps nested name", "orm.test", "orm.test.User.Sub", "User.Sub"},
+		{"keeps foreign type", "orm.test", "google.protobuf.Empty", "google.protobuf.Empty"},
+		{"exact match does not panic", "orm.test", "orm.test", "orm.test"},
+		{"empty package does not mangle", "", "User", "User"},
+		{"partial prefix is not a boundary", "lib", "library.User", "library.User"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			x := require.New(t)
+			b := &strings.Builder{}
+			p := ast.NewPrinter(b, tc.pkg)
+			p.PrintTypename(tc.in)
+			x.Equal(tc.want, b.String())
+		})
+	}
+}
+
 func TestPrinter(t *testing.T) {
 	WithPrinter(func(x *require.Assertions, b *strings.Builder, p ast.Printer) {
 		p.Newline()
