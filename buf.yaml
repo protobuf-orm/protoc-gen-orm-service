@@ -3,6 +3,10 @@ modules:
   - path: ./proto
 deps:
   - buf.build/orm/orm
+  # The generated Apply RPC carries a patch.Patch, so the generated .proto
+  # imports patch/patch.proto. Its schema is not frozen yet, so this is pinned
+  # by buf.lock rather than tracked.
+  - buf.build/patch/patch
 lint:
   use:
     - BASIC

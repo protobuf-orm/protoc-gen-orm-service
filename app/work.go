@@ -190,6 +190,10 @@ func (w *work) run(ctx context.Context, f *ast.File, entity graph.Entity) error 
 	}
 	if rpcs.HasPatch() {
 		fw.xRpcPatch()
+		// protobuf-orm has no `apply` option of its own, so Apply rides on
+		// `patch`: both are "update an existing entity", and Apply is the one
+		// that can express updates PatchRequest has no field shape for.
+		fw.xRpcApply()
 	}
 	if rpcs.HasErase() {
 		fw.xRpcErase()
