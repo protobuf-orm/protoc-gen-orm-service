@@ -16,32 +16,32 @@ func (w *fileWork) xRpcPatch() ast.Rpc {
 	)
 }
 
+// xMsgPatch emits the PatchRequest.
+//
+// Where each field goes is graph's to say, not this generator's: the server
+// that converts a request back into a patch document has to read the same
+// layout, and it lives in another repository. Every number and every companion
+// name here comes from graph.Patch*, so the two cannot drift apart.
 func (w *fileWork) xMsgPatch() ast.Message {
 	return w.defineMsg("PatchRequest", func(m *ast.Message) {
 		m.Body = append(m.Body, ast.MessageField{
 			Type:   w.xMsgRef().Name,
 			Name:   "ref",
-			Number: int(w.entity.Key().Number()),
+			Number: int(graph.PatchRefNumber(w.entity)),
 		})
 
-		for p := range w.entity.Props() {
-			if p.IsImmutable() {
-				continue
-			}
-
+		for p := range graph.PatchProps(w.entity) {
 			f := ast.MessageField{
 				Name:   p.Name(),
-				Number: int(p.Number())*2 - 1,
+				Number: int(graph.PatchValueNumber(p)),
 			}
-			if p.Descriptor().IsList() {
+			if p.IsList() {
 				f.Label = ast.LabelRepeated
 			}
 
-			is_version := false
 			switch p := p.(type) {
 			case graph.Field:
 				f.Type = w.useFieldType(p)
-				is_version = p.IsVersion()
 
 			case graph.Edge:
 				f.Type = w.withEntity(p.Target()).xMsgRef().Name
@@ -51,18 +51,11 @@ func (w *fileWork) xMsgPatch() ast.Message {
 			}
 			m.Body = append(m.Body, f)
 
-			switch {
-			case is_version:
+			if name := graph.PatchFlagName(p); name != "" {
 				m.Body = append(m.Body, ast.MessageField{
 					Type:   "bool",
-					Name:   p.Name() + "_force",
-					Number: int(p.Number()) * 2,
-				})
-			case p.IsNullable():
-				m.Body = append(m.Body, ast.MessageField{
-					Type:   "bool",
-					Name:   p.Name() + "_null",
-					Number: int(p.Number()) * 2,
+					Name:   name,
+					Number: int(graph.PatchFlagNumber(p)),
 				})
 			}
 		}

@@ -189,6 +189,15 @@ func (w *work) run(ctx context.Context, f *ast.File, entity graph.Entity) error 
 		fw.xRpcGet()
 	}
 	if rpcs.HasPatch() {
+		// The request's numbering is arithmetic on the entity's, and the
+		// arithmetic can collide -- with `ref`, which borrows the key's number,
+		// or with protobuf's reserved band. Ask before emitting: a duplicate
+		// number surfaces here, naming the entity, instead of as a parse error
+		// in a generated file nobody wrote.
+		if _, err := graph.PatchLayout(entity); err != nil {
+			return err
+		}
+
 		fw.xRpcPatch()
 		// protobuf-orm has no `apply` option of its own, so Apply rides on
 		// `patch`: both are "update an existing entity", and Apply is the one
