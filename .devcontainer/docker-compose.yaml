@@ -3,29 +3,32 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-
     command: sleep infinity
 
+    user: "1000"
     privileged: true
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - seccomp:unconfined
+    environment:
+      - SHELL=/bin/zsh
 
     volumes:
-      - type: bind
-        source: ..
-        target: /workspace
-      - type: bind
-        source: ${HOME}/workspace
-        target: /workspaces
-      - type: volume
-        source: mod.cache.go.dev
-        target: /go/pkg/mod
-      - type: volume
-        source: bin.cache.go.dev
-        target: /home/hypnos/.cache/go-build
+      - command.history:/commandhistory
+      - go.cache.mod:/go/pkg/mod
+      - go.cache.bin:/home/hypnos/.cache/go-build
+
+      - ..:/workspace
+      - ${HOME}/workspaces:/workspaces
+
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 8G
+          pids: 2048
+        reservations:
+          cpus: "2"
+          memory: 4G
 
 volumes:
-  mod.cache.go.dev:
-  bin.cache.go.dev:
+  command.history:
+  go.cache.mod:
+  go.cache.bin:
