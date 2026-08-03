@@ -54,9 +54,9 @@ message EdgeGetRequest {
 
 message EdgePatchRequest {
 	EdgeRef ref = 1;
-	UserRef required = 31;
-	UserRef nullable = 95;
-	bool nullable_null = 96;
+	UserRef required = 32;
+	UserRef nullable = 96;
+	bool nullable_null = 97;
 }
 
 message EdgeApplyRequest {
