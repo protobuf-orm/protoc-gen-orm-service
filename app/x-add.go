@@ -29,7 +29,18 @@ func (w *fileWork) xMsgAddRequest() ast.Message {
 
 			switch p := p.(type) {
 			case graph.Field:
+				// The version is the server's to stamp, so there is nothing for
+				// a request to say about it.
 				if p.IsVersion() {
+					continue
+				}
+				// And a row is added alive. No value the erased field could
+				// carry here means anything: a date on it says the row is gone,
+				// and a row that arrives gone is a delete with extra steps --
+				// one that skips whatever Erase does besides writing a column.
+				// `graph.PatchProps` leaves it out of the PatchRequest for the
+				// same reason.
+				if p.IsErased() {
 					continue
 				}
 
