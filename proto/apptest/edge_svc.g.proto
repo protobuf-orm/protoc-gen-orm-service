@@ -56,6 +56,10 @@ message EdgePatchRequest {
 	EdgeRef ref = 1;
 	UserRef required = 32;
 	UserRef nullable = 96;
+	// Clear nullable instead of writing it.
+	// It takes a field of its own because an unset value already means
+	// "leave it alone", so no value could have meant NULL. It wins
+	// outright: setting both this and nullable clears.
 	bool nullable_null = 97;
 }
 
