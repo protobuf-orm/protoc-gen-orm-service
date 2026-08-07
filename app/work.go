@@ -109,10 +109,17 @@ func (w *fileWork) path() string {
 }
 
 // withEntity references message which defined by the given entity.
+//
+// An entity that lands in this same output file is referenced without an
+// import. That is only reachable when one source file declares more than one
+// entity and one of them holds an edge to another, so both are generated into
+// one file -- and a file that imports itself is a cycle the compiler refuses.
 func (w *fileWork) withEntity(v graph.Entity) *fileWork {
 	name := string(v.FullName())
-	p := w.root.mustGetPath(v)
-	w.imports["_"+name] = p
+	if p := w.root.mustGetPath(v); p != w.path() {
+		w.imports["_"+name] = p
+	}
+
 	return w.root.newFileWork(v)
 }
 
