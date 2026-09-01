@@ -1,10 +1,10 @@
 module github.com/protobuf-orm/protoc-gen-orm-service
 
-go 1.26.2
+go 1.27.0
 
 require (
 	github.com/ettle/strcase v0.2.0
-	github.com/protobuf-orm/protobuf-orm v0.0.0-20260807003431-ce1156ba9f29
+	github.com/protobuf-orm/protobuf-orm v0.0.0-20260901155106-6bf45a2a1e67
 	github.com/stretchr/testify v1.10.0
 	google.golang.org/protobuf v1.36.11
 )
