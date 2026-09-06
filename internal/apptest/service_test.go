@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/protobuf-orm/protobuf-orm/graph"
+	"github.com/protobuf-orm/protobuf-orm/graph/gogen"
 	"github.com/protobuf-orm/protoc-gen-orm-service/app"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/compiler/protogen"
@@ -74,7 +75,7 @@ func generate(t *testing.T) map[string]string {
 
 	ctx := context.Background()
 	g := graph.NewGraph()
-	x.NoError(graph.ParseFiles(ctx, g, p.Files))
+	x.NoError(gogen.ParseFiles(ctx, g, p.Files))
 
 	a, err := app.New(app.WithNamer(template.Must(
 		template.New("namer").Parse("{{.Name}}_svc.g.proto"),

@@ -6,6 +6,7 @@ import (
 	"text/template"
 
 	"github.com/protobuf-orm/protobuf-orm/graph"
+	"github.com/protobuf-orm/protobuf-orm/graph/gogen"
 	"github.com/protobuf-orm/protoc-gen-orm-service/app"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -28,7 +29,7 @@ func (h *Handler) Run(p *protogen.Plugin) error {
 	// TODO: set logger
 
 	g := graph.NewGraph()
-	if err := graph.ParseFiles(ctx, g, p.Files); err != nil {
+	if err := gogen.ParseFiles(ctx, g, p.Files); err != nil {
 		return fmt.Errorf("parse entities: %w", err)
 	}
 
