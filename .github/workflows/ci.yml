@@ -1,0 +1,43 @@
+# What this repository is, is the generator that writes the service contracts
+# in `proto/apptest` -- so the check worth having is to generate and see
+# whether anything moved. A generated file that was not regenerated compiles
+# perfectly and is wrong, which is the failure this repository exists to
+# produce in other people's code and is no less true of its own.
+#
+# It had moved. The four `*_svc.g.proto` here were months behind the generator
+# that writes them, still returning `google.protobuf.Empty` from Erase where it
+# now returns a response saying whether the call is the one that erased the
+# row.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: bufbuild/buf-action@v1
+        with:
+          setup_only: true
+
+      # Twice, and not by mistake, for the reason the plugin repositories run
+      # it twice: the plugins in one invocation read the inputs as they were
+      # when it started, so a contract written by this run is only compiled by
+      # the next.
+      - run: buf generate
+      - run: buf generate
+
+      - run: git diff --exit-code
+
+      - run: gofmt -l . | tee /dev/stderr | (! read)
+      - run: go build ./...
+      - run: go vet ./...
+      - run: go test ./... -count=1

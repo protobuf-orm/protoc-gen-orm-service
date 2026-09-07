@@ -7,7 +7,6 @@ package apptest;
 
 import "apptest/edge.proto";
 import "apptest/user_svc.g.proto";
-import "google/protobuf/empty.proto";
 import "patch/patch.proto";
 
 option go_package = "github.com/protobuf-orm/protoc-gen-orm-service/internal/apptest";
@@ -22,7 +21,7 @@ service EdgeService {
 	// Apply applies a patch document to an existing Edge
 	rpc Apply(EdgeApplyRequest) returns (Edge);
 	// Erase deletes a Edge
-	rpc Erase(EdgeRef) returns (google.protobuf.Empty);
+	rpc Erase(EdgeRef) returns (EdgeEraseResponse);
 }
 
 message EdgeAddRequest {
@@ -66,4 +65,13 @@ message EdgePatchRequest {
 message EdgeApplyRequest {
 	EdgeRef ref = 1;
 	patch.Patch patch = 2;
+}
+
+message EdgeEraseResponse {
+	// Erased is whether this call is the one that erased the row.
+	// 
+	// False for a row that was already gone, was never there, or is out
+	// of this caller's reach -- which are one answer on purpose, and the
+	// reason the RPC does not fail instead.
+	bool erased = 1;
 }
