@@ -21,6 +21,10 @@ type work struct {
 	imports map[string]string
 	msgs    map[string]ast.Message
 
+	// The messages being defined, by name, while their bodies are written.
+	// See [fileWork.defineMsg].
+	defining map[string]bool
+
 	// path to source proto file -> file structure
 	files map[string]*ast.File
 }
@@ -29,8 +33,9 @@ func newWork() *work {
 	return &work{
 		paths: map[string]string{},
 
-		imports: map[string]string{},
-		msgs:    map[string]ast.Message{},
+		imports:  map[string]string{},
+		msgs:     map[string]ast.Message{},
+		defining: map[string]bool{},
 
 		files: map[string]*ast.File{},
 	}
@@ -152,6 +157,22 @@ func (w *fileWork) defineMsg(name string, f func(m *ast.Message)) ast.Message {
 	if ok {
 		return m
 	}
+
+	// Asked for again while its own body is being written: an entity with an
+	// edge to its own type, whose Select selects the parent the same way, or
+	// two entities in one file with edges to each other. A message may
+	// contain itself, so what the reference needs is the name, and the
+	// definition already in progress is the one that is emitted.
+	//
+	// It is kept on the root rather than on this fileWork because the second
+	// ask comes through another one: [fileWork.withEntity] makes a fresh
+	// fileWork for every reference, so a cache on this one never sees it --
+	// which is why the recursion did not end.
+	if w.root.defining[name] {
+		return ast.Message{Name: name}
+	}
+	w.root.defining[name] = true
+	defer delete(w.root.defining, name)
 
 	m = ast.Message{
 		Name: name,

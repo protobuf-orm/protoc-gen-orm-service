@@ -32,6 +32,7 @@ var fixtures = []string{
 	"apptest/edge.proto",
 	"apptest/field.proto",
 	"apptest/tenant.proto",
+	"apptest/tree.proto",
 	"apptest/user.proto",
 }
 
@@ -126,4 +127,28 @@ func TestRpcApplyIsGatedOnPatch(t *testing.T) {
 			"Patch and Apply disagree in %s", path,
 		)
 	}
+}
+
+// An entity with an edge to its own type selects the far end the same way it
+// selects itself, and two entities of one file with edges to each other each
+// select the other. Generating either used to recurse until the stack ran out.
+func TestSelectContainsItself(t *testing.T) {
+	x := require.New(t)
+
+	files := generate(t)
+	src, ok := files["apptest/tree_svc.g.proto"]
+	x.True(ok, "generated: %v", slices.Sorted(maps.Keys(files)))
+
+	x.Contains(src, strings.Join([]string{
+		"message NodeSelect {",
+		"\tbool all = 1;",
+		"\tNodeSelect parent = 16;",
+		"}",
+	}, "\n"))
+	x.Contains(src, "\tRightSelect right = 16;\n")
+	x.Contains(src, "\tLeftSelect left = 16;\n")
+
+	// Written once, by the entity it belongs to.
+	x.Equal(1, strings.Count(src, "message NodeSelect {"))
+	x.NotContains(src, `import "apptest/tree_svc.g.proto";`, "a file does not import itself")
 }
