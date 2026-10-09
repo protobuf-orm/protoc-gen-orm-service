@@ -1,0 +1,41 @@
+edition = "2023";
+
+package apptest;
+
+import "orm.proto";
+
+option go_package = "github.com/protobuf-orm/protoc-gen-orm-service/internal/apptest";
+
+// Node holds an edge to its own type, which is how a tree is written: the
+// message that selects a node selects its parent the same way.
+message Node {
+  string id = 1 [(orm.field) = {key: true}];
+
+  Node parent = 0x10 [(orm.edge) = {nullable: true}];
+
+  option (orm.message) = {
+    rpc: {crud: true}
+  };
+}
+
+// Left and Right point at each other, which a single file allows and is the
+// same cycle one step longer.
+message Left {
+  string id = 1 [(orm.field) = {key: true}];
+
+  Right right = 0x10 [(orm.edge) = {nullable: true}];
+
+  option (orm.message) = {
+    rpc: {crud: true}
+  };
+}
+
+message Right {
+  string id = 1 [(orm.field) = {key: true}];
+
+  Left left = 0x10 [(orm.edge) = {nullable: true}];
+
+  option (orm.message) = {
+    rpc: {crud: true}
+  };
+}

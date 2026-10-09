@@ -42,6 +42,17 @@ func (a *App) Run(ctx context.Context, p *protogen.Plugin, g *graph.Graph) error
 	}
 
 	w := newWork()
+
+	// Where every entity's contract is written, before any is: an edge may
+	// point at an entity declared further down the same file -- two that
+	// point at each other always do -- and the one written first has to know
+	// where the other's messages are.
+	type target struct {
+		f    *protogen.File
+		gf   *protogen.GeneratedFile
+		path string
+	}
+	targets := []target{}
 	for _, f := range p.Files {
 		if !f.Generate {
 			continue
@@ -52,6 +63,17 @@ func (a *App) Run(ctx context.Context, p *protogen.Plugin, g *graph.Graph) error
 			handle_err(err)
 			continue
 		}
+		targets = append(targets, target{f, gf, path})
+
+		for _, m := range f.Messages {
+			if entity, ok := g.Entities[m.Desc.FullName()]; ok {
+				w.paths[string(entity.FullName())] = path
+			}
+		}
+	}
+
+	for _, t := range targets {
+		f, gf := t.f, t.gf
 
 		var pf *ast.File
 		for _, m := range f.Messages {
@@ -59,8 +81,6 @@ func (a *App) Run(ctx context.Context, p *protogen.Plugin, g *graph.Graph) error
 			if !ok {
 				continue
 			}
-
-			w.paths[string(entity.FullName())] = path
 
 			pf = w.newFile(f, entity)
 			if err := w.run(ctx, pf, entity); err != nil {

@@ -5,6 +5,7 @@ inputs:
       - proto/apptest/edge_svc.g.proto
       - proto/apptest/field_svc.g.proto
       - proto/apptest/tenant_svc.g.proto
+      - proto/apptest/tree_svc.g.proto
       - proto/apptest/user_svc.g.proto
 plugins:
   - local: [go, tool, google.golang.org/protobuf/cmd/protoc-gen-go]
