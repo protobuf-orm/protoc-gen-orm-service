@@ -129,6 +129,46 @@ func TestRpcApplyIsGatedOnPatch(t *testing.T) {
 	}
 }
 
+// AddMany is a list of the entity's own AddRequest in and the rows out, so that
+// an item is an Add's request field for field, and the comment says the most
+// one call carries.
+func TestRpcAddMany(t *testing.T) {
+	x := require.New(t)
+
+	files := generate(t)
+	src, ok := files["apptest/user_svc.g.proto"]
+	x.True(ok, "generated: %v", slices.Sorted(maps.Keys(files)))
+
+	x.Contains(src, strings.Join([]string{
+		"\t// AddMany creates up to 200 new User rows in one call, all of them or none",
+		"\trpc AddMany(UserAddManyRequest) returns (UserAddManyResponse);",
+	}, "\n"))
+	x.Contains(src, strings.Join([]string{
+		"message UserAddManyRequest {",
+		"\trepeated UserAddRequest items = 1;",
+		"}",
+	}, "\n"))
+	x.Contains(src, strings.Join([]string{
+		"message UserAddManyResponse {",
+		"\trepeated User items = 1;",
+		"}",
+	}, "\n"))
+}
+
+// And only where the entity asked for it: `crud` alone is no AddMany.
+func TestRpcAddManyIsAskedFor(t *testing.T) {
+	x := require.New(t)
+
+	files := generate(t)
+	for path, src := range files {
+		if path == "apptest/user_svc.g.proto" {
+			continue
+		}
+		x.NotContains(src, "AddMany", "%s has an AddMany it did not ask for", path)
+	}
+	x.Contains(files["apptest/tenant_svc.g.proto"], "rpc Add(")
+}
+
 // An entity with an edge to its own type selects the far end the same way it
 // selects itself, and two entities of one file with edges to each other each
 // select the other. Generating either used to recurse until the stack ran out.

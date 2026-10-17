@@ -213,6 +213,9 @@ func (w *work) run(ctx context.Context, f *ast.File, entity graph.Entity) error 
 	if rpcs.HasAdd() {
 		fw.xRpcAdd()
 	}
+	if rpcs.HasAddMany() {
+		fw.xRpcAddMany()
+	}
 	if rpcs.HasGet() {
 		fw.xRpcGet()
 	}
