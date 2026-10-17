@@ -1,6 +1,8 @@
 package app
 
 import (
+	"fmt"
+
 	"github.com/protobuf-orm/protobuf-orm/graph"
 	"github.com/protobuf-orm/protoc-gen-orm-service/internal/ast"
 )
@@ -14,6 +16,44 @@ func (w *fileWork) xRpcAdd() ast.Rpc {
 			ResponseType: w.useEntityType(w.entity),
 		},
 	)
+}
+
+func (w *fileWork) xRpcAddMany() ast.Rpc {
+	v := w.entity.Rpcs().GetAddMany()
+	return w.defineRpc(
+		ast.Comment(fmt.Sprintf("AddMany creates up to %d new %s rows in one call, all of them or none", v.Max(), w.entity.Name())),
+		ast.Rpc{
+			Name:         "AddMany",
+			RequestType:  w.xMsgAddManyRequest().Name,
+			ResponseType: w.xMsgAddManyResponse().Name,
+		},
+	)
+}
+
+// xMsgAddManyRequest is a list of the entity's own AddRequest rather than a
+// message of its own, so that an item is an Add's request field for field and
+// whatever reads one reads the other.
+func (w *fileWork) xMsgAddManyRequest() ast.Message {
+	return w.defineMsg("AddManyRequest", func(m *ast.Message) {
+		m.Body = append(m.Body, ast.MessageField{
+			Name:   "items",
+			Number: 1,
+			Label:  ast.LabelRepeated,
+			Type:   w.xMsgAddRequest().Name,
+		})
+	})
+}
+
+// xMsgAddManyResponse is the rows the items added, in the order of the items.
+func (w *fileWork) xMsgAddManyResponse() ast.Message {
+	return w.defineMsg("AddManyResponse", func(m *ast.Message) {
+		m.Body = append(m.Body, ast.MessageField{
+			Name:   "items",
+			Number: 1,
+			Label:  ast.LabelRepeated,
+			Type:   w.useEntityType(w.entity),
+		})
+	})
 }
 
 func (w *fileWork) xMsgAddRequest() ast.Message {

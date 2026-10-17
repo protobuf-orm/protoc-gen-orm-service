@@ -4,8 +4,8 @@ A `protoc`/`buf` plugin that generates **gRPC service definitions** (`.proto`)
 from messages annotated with [protobuf-orm](https://github.com/protobuf-orm/protobuf-orm)
 options.
 
-You annotate an entity once; this plugin emits its `Add` / `Get` / `Patch` /
-`Apply` / `Erase` service and the request/response messages those RPCs need. The output is
+You annotate an entity once; this plugin emits its `Add` / `AddMany` / `Get` /
+`Patch` / `Apply` / `Erase` service and the request/response messages those RPCs need. The output is
 itself a `.proto` file, so it feeds back into your normal protoc pipeline (e.g.
 `protoc-gen-go-grpc`, or [protoc-gen-orm-go](../protoc-gen-orm-go) /
 [protoc-gen-orm-ent](../protoc-gen-orm-ent) for the implementation).
@@ -64,6 +64,29 @@ Highlights of the mapping:
   [`patch.Patch`](https://github.com/lesomnus/protobuf-patch) document instead of
   a field per prop, for the updates a fixed request shape cannot express — edit
   one map key, splice a list, or test-then-set. See [Apply](#apply).
+- **`UserAddManyRequest`** is there when the entity asks for AddMany. See
+  [AddMany](#addmany).
+
+## AddMany
+
+`add: {many: {}}` beside an entity's Add asks for AddMany, which adds many rows
+in one call; `crud` alone does not:
+
+```proto
+option (orm.message) = {rpc: {crud: true, add: {many: {max: 200}}}};
+```
+
+```proto
+rpc AddMany(UserAddManyRequest) returns (UserAddManyResponse);
+
+message UserAddManyRequest { repeated UserAddRequest items = 1; }
+message UserAddManyResponse { repeated User items = 1; }
+```
+
+An item is the entity's own `UserAddRequest`, so whatever reads an Add's request
+reads an item the same way. The rows come back in the order of the items, and
+the call is all of them or none. `max` is the most items one call may carry,
+1000 when unset; the comment on the RPC says which.
 
 ## Apply
 
