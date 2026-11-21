@@ -85,6 +85,7 @@ func (w *fileWork) xMsgAddRequest() ast.Message {
 				}
 
 				f.Type = w.useFieldType(p)
+				f.Opts = w.fieldTypeOptions(p)
 				if !p.IsList() && p.Type().IsScalar() && !p.IsOptional() {
 					f.Opts = append(f.Opts, ast.FeaturesFieldPresenceImplicit.WithinField())
 				}

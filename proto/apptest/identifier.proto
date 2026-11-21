@@ -1,0 +1,15 @@
+edition = "2023";
+package apptest;
+import "orm.proto";
+option go_package = "github.com/protobuf-orm/protoc-gen-orm-service/internal/apptest";
+message Identifier {
+  bytes id = 1 [(orm.field) = {type: TYPE_UUID, key: true}];
+  bytes subject = 8 [(orm.field) = {type: TYPE_UUID, unique: true, default: ""}];
+  bytes stamp = 9 [(orm.field) = {type: TYPE_UUID}];
+  bytes blob_id = 10 [(orm.field) = {type: TYPE_BYTES}];
+  string serial = 11;
+  option (orm.message) = {
+    rpc: {crud: true}
+    indexes: [{name: "scope", unique: true, refs: [{name: "stamp", number: 9}, {name: "serial", number: 11}]}]
+  };
+}

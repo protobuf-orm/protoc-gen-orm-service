@@ -31,6 +31,7 @@ import (
 var fixtures = []string{
 	"apptest/edge.proto",
 	"apptest/field.proto",
+	"apptest/identifier.proto",
 	"apptest/tenant.proto",
 	"apptest/tree.proto",
 	"apptest/user.proto",
@@ -191,4 +192,24 @@ func TestSelectContainsItself(t *testing.T) {
 	// Written once, by the entity it belongs to.
 	x.Equal(1, strings.Count(src, "message NodeSelect {"))
 	x.NotContains(src, `import "apptest/tree_svc.g.proto";`, "a file does not import itself")
+}
+
+// A UUID can be named subject; its semantic type survives every generated
+// copy. An explicitly ordinary bytes field keeps that type even with an _id
+// suffix, while storage ownership and defaults stay on the entity.
+func TestDeclaredFieldTypesSurviveGeneration(t *testing.T) {
+	files := generate(t)
+	src := files["apptest/identifier_svc.g.proto"]
+	require.Contains(t, src, `import "orm.proto";`)
+	for _, name := range []string{"IdentifierAddRequest", "IdentifierPatchRequest", "IdentifierRef", "IdentifierRefByScope"} {
+		start := strings.Index(src, "message "+name+" {")
+		require.NotEqual(t, -1, start)
+		body := strings.SplitN(src[start:], "\n}", 2)[0]
+		require.Contains(t, body, "TYPE_UUID", name)
+		require.NotContains(t, body, "unique:", name)
+		require.NotContains(t, body, "key:", name)
+		require.NotContains(t, body, "default:", name)
+	}
+	require.Equal(t, 8, strings.Count(src, "TYPE_UUID"), "UUIDs in Add, Patch, scalar Ref and composite Ref")
+	require.Equal(t, 2, strings.Count(src, "TYPE_BYTES"), "ordinary bytes in Add and Patch")
 }

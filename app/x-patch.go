@@ -42,6 +42,7 @@ func (w *fileWork) xMsgPatch() ast.Message {
 			switch p := p.(type) {
 			case graph.Field:
 				f.Type = w.useFieldType(p)
+				f.Opts = w.fieldTypeOptions(p)
 
 			case graph.Edge:
 				f.Type = w.withEntity(p.Target()).xMsgRef().Name
