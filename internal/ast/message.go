@@ -87,12 +87,11 @@ type MessageOneofField struct {
 	Type   string
 	Name   string
 	Number int
+	Opts   []FieldOption
 
 	tagMessageOneofBody
 }
 
 func (v MessageOneofField) PrintTo(p Printer) {
-	p.PrintTypename(v.Type)
-	fmt.Fprintf(p, " %s = %d;", v.Name, v.Number)
-	p.Newline()
+	MessageField{Type: v.Type, Name: v.Name, Number: v.Number, Opts: v.Opts}.PrintTo(p)
 }

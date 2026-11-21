@@ -20,6 +20,7 @@ func (w *fileWork) xMsgRef() ast.Message {
 			switch p := p.(type) {
 			case graph.Field:
 				f.Type = w.useFieldType(p)
+				f.Opts = w.fieldTypeOptions(p)
 
 			case graph.Edge:
 				panic("edge key not implemented")
@@ -59,6 +60,7 @@ func (w *fileWork) xMsgRefByIndex(index graph.Index) ast.Message {
 			switch u := p.(type) {
 			case graph.Field:
 				f.Type = w.useFieldType(u)
+				f.Opts = w.fieldTypeOptions(u)
 
 			case graph.Edge:
 				f.Type = w.withEntity(u.Target()).xMsgRef().Name

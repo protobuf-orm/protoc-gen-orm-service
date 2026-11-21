@@ -67,6 +67,21 @@ Highlights of the mapping:
 - **`UserAddManyRequest`** is there when the entity asks for AddMany. See
   [AddMany](#addmany).
 
+## Field types in requests
+
+A declared `(orm.field).type` follows a field into `AddRequest`, `PatchRequest`,
+scalar reference keys and composite-index messages. For example, an entity's
+`bytes subject = 8 [(orm.field) = {type: TYPE_UUID, unique: true}];` produces
+request and reference fields that still carry `type: TYPE_UUID`. Descriptor
+consumers can recognize UUIDs without depending on an `id` naming convention.
+An explicit `TYPE_BYTES` stays bytes too.
+
+Only the type is copied. Key ownership, uniqueness, defaults, nullability and
+version behavior belong to the entity; copying those storage options into a
+request would give them a second meaning. The generated field's wire type,
+number and presence stay the same. Regenerate the contracts and client code
+after updating the plugin; no database migration is needed for this metadata.
+
 ## AddMany
 
 `add: {many: {}}` beside an entity's Add asks for AddMany, which adds many rows

@@ -4,6 +4,7 @@ inputs:
     exclude_paths:
       - proto/apptest/edge_svc.g.proto
       - proto/apptest/field_svc.g.proto
+      - proto/apptest/identifier_svc.g.proto
       - proto/apptest/tenant_svc.g.proto
       - proto/apptest/tree_svc.g.proto
       - proto/apptest/user_svc.g.proto
