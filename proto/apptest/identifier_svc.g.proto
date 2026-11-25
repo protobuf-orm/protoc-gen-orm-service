@@ -7,7 +7,6 @@ package apptest;
 
 import "apptest/identifier.proto";
 import "orm.proto";
-import "patch/patch.proto";
 
 option go_package = "github.com/protobuf-orm/protoc-gen-orm-service/internal/apptest";
 
@@ -18,8 +17,6 @@ service IdentifierService {
 	rpc Get(IdentifierGetRequest) returns (Identifier);
 	// Patch updates an existing Identifier
 	rpc Patch(IdentifierPatchRequest) returns (Identifier);
-	// Apply applies a patch document to an existing Identifier
-	rpc Apply(IdentifierApplyRequest) returns (Identifier);
 	// Erase deletes a Identifier
 	rpc Erase(IdentifierRef) returns (IdentifierEraseResponse);
 }
@@ -104,11 +101,6 @@ message IdentifierPatchRequest {
 	// "leave it alone", so no value could have meant NULL. It wins
 	// outright: setting both this and serial clears.
 	bool serial_null = 23;
-}
-
-message IdentifierApplyRequest {
-	IdentifierRef ref = 1;
-	patch.Patch patch = 2;
 }
 
 message IdentifierEraseResponse {

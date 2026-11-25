@@ -14,7 +14,7 @@ message Node {
   Node parent = 0x10 [(orm.edge) = {nullable: true}];
 
   option (orm.message) = {
-    rpc: {crud: true}
+    rpc: {add: {}, get: {}, patch: {}, erase: {}}
   };
 }
 
@@ -26,7 +26,7 @@ message Left {
   Right right = 0x10 [(orm.edge) = {nullable: true}];
 
   option (orm.message) = {
-    rpc: {crud: true}
+    rpc: {add: {}, get: {}, patch: {}, erase: {}}
   };
 }
 
@@ -36,6 +36,6 @@ message Right {
   Left left = 0x10 [(orm.edge) = {nullable: true}];
 
   option (orm.message) = {
-    rpc: {crud: true}
+    rpc: {add: {}, get: {}, patch: {}, erase: {}}
   };
 }

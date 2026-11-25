@@ -230,9 +230,12 @@ func (w *work) run(ctx context.Context, f *ast.File, entity graph.Entity) error 
 		}
 
 		fw.xRpcPatch()
-		// protobuf-orm has no `apply` option of its own, so Apply rides on
-		// `patch`: both are "update an existing entity", and Apply is the one
-		// that can express updates PatchRequest has no field shape for.
+	}
+	if rpcs.HasApply() {
+		// Apply is a verb of its own, there when `apply` asks for it and not
+		// because Patch is: the two update an existing entity, but each is
+		// asked for alone. Apply's request is a ref and a patch document, so
+		// it needs nothing of the PatchRequest's layout.
 		fw.xRpcApply()
 	}
 	if rpcs.HasErase() {

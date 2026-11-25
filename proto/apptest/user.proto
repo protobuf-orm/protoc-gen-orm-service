@@ -29,10 +29,13 @@ message User {
 
   option (orm.message) = {
     rpc: {
-      crud: true
       add: {
         many: {max: 200}
       }
+      get: {}
+      patch: {}
+      apply: {}
+      erase: {}
     }
     indexes: [
       {
