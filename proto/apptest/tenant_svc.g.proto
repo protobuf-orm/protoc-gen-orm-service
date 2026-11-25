@@ -19,8 +19,6 @@ service TenantService {
 	rpc Get(TenantGetRequest) returns (Tenant);
 	// Patch updates an existing Tenant
 	rpc Patch(TenantPatchRequest) returns (Tenant);
-	// Apply applies a patch document to an existing Tenant
-	rpc Apply(TenantApplyRequest) returns (Tenant);
 	// Erase deletes a Tenant
 	rpc Erase(TenantRef) returns (TenantEraseResponse);
 }
@@ -64,11 +62,6 @@ message TenantPatchRequest {
 	map<string, string> labels = 14;
 }
 
-message TenantApplyRequest {
-	TenantRef ref = 1;
-	patch.Patch patch = 2;
-}
-
 message TenantEraseResponse {
 	// Erased is whether this call is the one that erased the row.
 	// 
@@ -76,4 +69,34 @@ message TenantEraseResponse {
 	// of this caller's reach -- which are one answer on purpose, and the
 	// reason the RPC does not fail instead.
 	bool erased = 1;
+}
+
+service PreferenceService {
+	// Get retrieves a Preference
+	rpc Get(PreferenceGetRequest) returns (Preference);
+	// Apply applies a patch document to an existing Preference
+	rpc Apply(PreferenceApplyRequest) returns (Preference);
+}
+
+message PreferenceRef {
+	oneof key {
+		bytes id = 1 [
+			(orm.field) = {type: TYPE_UUID}
+		];
+	}
+}
+
+message PreferenceSelect {
+	bool all = 1;
+	bool labels = 7;
+}
+
+message PreferenceGetRequest {
+	PreferenceRef ref = 1;
+	PreferenceSelect select = 2;
+}
+
+message PreferenceApplyRequest {
+	PreferenceRef ref = 1;
+	patch.Patch patch = 2;
 }

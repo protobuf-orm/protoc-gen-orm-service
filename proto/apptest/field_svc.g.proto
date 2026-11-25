@@ -6,7 +6,6 @@ edition = "2023";
 package apptest;
 
 import "apptest/field.proto";
-import "patch/patch.proto";
 import "google/protobuf/struct.proto";
 
 option go_package = "github.com/protobuf-orm/protoc-gen-orm-service/internal/apptest";
@@ -18,8 +17,6 @@ service ValueFieldService {
 	rpc Get(ValueFieldGetRequest) returns (ValueField);
 	// Patch updates an existing ValueField
 	rpc Patch(ValueFieldPatchRequest) returns (ValueField);
-	// Apply applies a patch document to an existing ValueField
-	rpc Apply(ValueFieldApplyRequest) returns (ValueField);
 	// Erase deletes a ValueField
 	rpc Erase(ValueFieldRef) returns (ValueFieldEraseResponse);
 }
@@ -703,11 +700,6 @@ message ValueFieldPatchRequest {
 	bool explicit_level_with_default_null = 383;
 }
 
-message ValueFieldApplyRequest {
-	ValueFieldRef ref = 1;
-	patch.Patch patch = 2;
-}
-
 message ValueFieldEraseResponse {
 	// Erased is whether this call is the one that erased the row.
 	// 
@@ -724,8 +716,6 @@ service MessageFieldService {
 	rpc Get(MessageFieldGetRequest) returns (MessageField);
 	// Patch updates an existing MessageField
 	rpc Patch(MessageFieldPatchRequest) returns (MessageField);
-	// Apply applies a patch document to an existing MessageField
-	rpc Apply(MessageFieldApplyRequest) returns (MessageField);
 	// Erase deletes a MessageField
 	rpc Erase(MessageFieldRef) returns (MessageFieldEraseResponse);
 }
@@ -782,11 +772,6 @@ message MessageFieldPatchRequest {
 	bool explicit_with_default_null = 353;
 }
 
-message MessageFieldApplyRequest {
-	MessageFieldRef ref = 1;
-	patch.Patch patch = 2;
-}
-
 message MessageFieldEraseResponse {
 	// Erased is whether this call is the one that erased the row.
 	// 
@@ -803,8 +788,6 @@ service MapFieldService {
 	rpc Get(MapFieldGetRequest) returns (MapField);
 	// Patch updates an existing MapField
 	rpc Patch(MapFieldPatchRequest) returns (MapField);
-	// Apply applies a patch document to an existing MapField
-	rpc Apply(MapFieldApplyRequest) returns (MapField);
 	// Erase deletes a MapField
 	rpc Erase(MapFieldRef) returns (MapFieldEraseResponse);
 }
@@ -854,11 +837,6 @@ message MapFieldPatchRequest {
 	map<string, string> implicit_string_with_default = 288;
 	map<string, apptest.Level> implicit_enum_with_default = 290;
 	map<string, google.protobuf.Struct> implicit_json_with_default = 292;
-}
-
-message MapFieldApplyRequest {
-	MapFieldRef ref = 1;
-	patch.Patch patch = 2;
 }
 
 message MapFieldEraseResponse {

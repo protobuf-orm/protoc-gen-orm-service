@@ -6,7 +6,6 @@ edition = "2023";
 package apptest;
 
 import "apptest/tree.proto";
-import "patch/patch.proto";
 
 option go_package = "github.com/protobuf-orm/protoc-gen-orm-service/internal/apptest";
 
@@ -17,8 +16,6 @@ service NodeService {
 	rpc Get(NodeGetRequest) returns (Node);
 	// Patch updates an existing Node
 	rpc Patch(NodePatchRequest) returns (Node);
-	// Apply applies a patch document to an existing Node
-	rpc Apply(NodeApplyRequest) returns (Node);
 	// Erase deletes a Node
 	rpc Erase(NodeRef) returns (NodeEraseResponse);
 }
@@ -54,11 +51,6 @@ message NodePatchRequest {
 	bool parent_null = 33;
 }
 
-message NodeApplyRequest {
-	NodeRef ref = 1;
-	patch.Patch patch = 2;
-}
-
 message NodeEraseResponse {
 	// Erased is whether this call is the one that erased the row.
 	// 
@@ -75,8 +67,6 @@ service LeftService {
 	rpc Get(LeftGetRequest) returns (Left);
 	// Patch updates an existing Left
 	rpc Patch(LeftPatchRequest) returns (Left);
-	// Apply applies a patch document to an existing Left
-	rpc Apply(LeftApplyRequest) returns (Left);
 	// Erase deletes a Left
 	rpc Erase(LeftRef) returns (LeftEraseResponse);
 }
@@ -112,11 +102,6 @@ message LeftPatchRequest {
 	bool right_null = 33;
 }
 
-message LeftApplyRequest {
-	LeftRef ref = 1;
-	patch.Patch patch = 2;
-}
-
 message LeftEraseResponse {
 	// Erased is whether this call is the one that erased the row.
 	// 
@@ -133,8 +118,6 @@ service RightService {
 	rpc Get(RightGetRequest) returns (Right);
 	// Patch updates an existing Right
 	rpc Patch(RightPatchRequest) returns (Right);
-	// Apply applies a patch document to an existing Right
-	rpc Apply(RightApplyRequest) returns (Right);
 	// Erase deletes a Right
 	rpc Erase(RightRef) returns (RightEraseResponse);
 }
@@ -168,11 +151,6 @@ message RightPatchRequest {
 	// "leave it alone", so no value could have meant NULL. It wins
 	// outright: setting both this and left clears.
 	bool left_null = 33;
-}
-
-message RightApplyRequest {
-	RightRef ref = 1;
-	patch.Patch patch = 2;
 }
 
 message RightEraseResponse {

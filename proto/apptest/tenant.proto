@@ -23,6 +23,23 @@ message Tenant {
   }];
 
   option (orm.message) = {
-    rpc: {crud: true}
+    rpc: {add: {}, get: {}, patch: {}, erase: {}}
+  };
+}
+
+// Preference asks for Apply and not for Patch: its labels are edited a key at
+// a time, which a PatchRequest has no shape for, so it has no PatchRequest.
+message Preference {
+  bytes id = 1 [(orm.field) = {
+    type: TYPE_UUID
+    key: true
+  }];
+  map<string, string> labels = 7;
+
+  option (orm.message) = {
+    rpc: {
+      get: {}
+      apply: {}
+    }
   };
 }

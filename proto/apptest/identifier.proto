@@ -9,7 +9,7 @@ message Identifier {
   bytes blob_id = 10 [(orm.field) = {type: TYPE_BYTES}];
   string serial = 11;
   option (orm.message) = {
-    rpc: {crud: true}
+    rpc: {add: {}, get: {}, patch: {}, erase: {}}
     indexes: [{name: "scope", unique: true, refs: [{name: "stamp", number: 9}, {name: "serial", number: 11}]}]
   };
 }

@@ -4,8 +4,9 @@ A `protoc`/`buf` plugin that generates **gRPC service definitions** (`.proto`)
 from messages annotated with [protobuf-orm](https://github.com/protobuf-orm/protobuf-orm)
 options.
 
-You annotate an entity once; this plugin emits its `Add` / `AddMany` / `Get` /
-`Patch` / `Apply` / `Erase` service and the request/response messages those RPCs need. The output is
+You annotate an entity once; this plugin emits its service with the verbs it
+names -- `Add` / `AddMany` / `Get` / `Patch` / `Apply` / `Erase` -- and the
+request/response messages those RPCs need. The output is
 itself a `.proto` file, so it feeds back into your normal protoc pipeline (e.g.
 `protoc-gen-go-grpc`, or [protoc-gen-orm-go](../protoc-gen-orm-go) /
 [protoc-gen-orm-ent](../protoc-gen-orm-ent) for the implementation).
@@ -25,7 +26,7 @@ message User {
   google.protobuf.Timestamp date_created = 15 [(orm.field) = {immutable: true, default: ""}];
 
   option (orm.message) = {
-    rpc: {crud: true}
+    rpc: {add: {}, get: {}, patch: {}, apply: {}, erase: {}}
     indexes: [{name: "alias", unique: true, refs: [{name: "alias", number: 4}, {name: "tenant", number: 2}]}]
   };
 }
@@ -39,7 +40,7 @@ service UserService {
   rpc Get(UserGetRequest) returns (User);
   rpc Patch(UserPatchRequest) returns (User);
   rpc Apply(UserApplyRequest) returns (User);
-  rpc Erase(UserRef) returns (google.protobuf.Empty);
+  rpc Erase(UserRef) returns (UserEraseResponse);
 }
 
 message UserAddRequest { ... }        // creatable fields (no key, no version)
@@ -51,6 +52,11 @@ message UserPatchRequest { ... }      // nullable fields get a *_null flag; vers
 message UserApplyRequest { UserRef ref = 1; patch.Patch patch = 2; }
 ```
 
+Each verb is there when `(orm.message).rpc` names it and does not disable it,
+and no verb brings another: `patch: {}` is a Patch and no Apply, and `apply: {}`
+an Apply and no Patch. The one exception is AddMany, which is asked for inside
+the Add. An `rpc: {}` that names no verb is a service with none.
+
 Highlights of the mapping:
 
 - **`UserRef`** is a `oneof` over the primary key and every **unique index**
@@ -60,7 +66,7 @@ Highlights of the mapping:
 - **`UserSelect`** is a field mask used by `Get`.
 - **`UserPatchRequest`** adds a `<field>_null` boolean for nullable fields and a
   `<field>_force` boolean for the optimistic-locking `version` field.
-- **`UserApplyRequest`** carries a
+- **`UserApplyRequest`**, where the entity asks for `apply`, carries a
   [`patch.Patch`](https://github.com/lesomnus/protobuf-patch) document instead of
   a field per prop, for the updates a fixed request shape cannot express — edit
   one map key, splice a list, or test-then-set. See [Apply](#apply).
@@ -85,10 +91,10 @@ after updating the plugin; no database migration is needed for this metadata.
 ## AddMany
 
 `add: {many: {}}` beside an entity's Add asks for AddMany, which adds many rows
-in one call; `crud` alone does not:
+in one call; an Add alone does not:
 
 ```proto
-option (orm.message) = {rpc: {crud: true, add: {many: {max: 200}}}};
+option (orm.message) = {rpc: {add: {many: {max: 200}}, get: {}}};
 ```
 
 ```proto
@@ -128,11 +134,16 @@ same statement `_force` makes. Apply is atomic in the same way the format is: if
 any entry fails — a `test` that does not hold, a field that has moved — nothing
 is written.
 
-`Apply` is emitted wherever `Patch` is, since protobuf-orm has no `apply` option
-of its own for `(orm.message).rpc` to carry.
+`Apply` is there where the entity asks for it with `apply: {}`, and not because
+there is a `Patch`. Either is there without the other: an entity with `apply`
+and no `patch` has an `ApplyRequest` and no `PatchRequest`.
 
-Because the generated `.proto` now imports `patch/patch.proto`, add the module to
-your `buf.yaml`:
+```proto
+option (orm.message) = {rpc: {get: {}, apply: {}}};
+```
+
+Where there is an Apply, the generated `.proto` imports `patch/patch.proto`, so
+add the module to your `buf.yaml`:
 
 ```yaml
 deps:

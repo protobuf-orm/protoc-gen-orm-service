@@ -116,18 +116,59 @@ func TestRpcApply(t *testing.T) {
 	}, "\n"))
 }
 
-// Apply is emitted exactly where Patch is: protobuf-orm has no `apply` option,
-// so the two share the `patch` one.
-func TestRpcApplyIsGatedOnPatch(t *testing.T) {
+// block answers the body of the top-level definition that opens with head, or
+// fails the test when there is none.
+func block(t *testing.T, src string, head string) string {
+	t.Helper()
+	start := strings.Index(src, head+" {")
+	require.NotEqual(t, -1, start, "%s not found", head)
+	return strings.SplitN(src[start:], "\n}", 2)[0]
+}
+
+// No verb brings another: Patch is there without Apply where only `patch` is
+// asked for, and the contract has nothing of Apply's.
+func TestRpcPatchWithoutApply(t *testing.T) {
 	x := require.New(t)
 
-	for path, src := range generate(t) {
-		x.Equal(
-			strings.Contains(src, "rpc Patch("),
-			strings.Contains(src, "rpc Apply("),
-			"Patch and Apply disagree in %s", path,
-		)
-	}
+	files := generate(t)
+	src, ok := files["apptest/identifier_svc.g.proto"]
+	x.True(ok, "generated: %v", slices.Sorted(maps.Keys(files)))
+
+	x.Contains(src, "\trpc Patch(IdentifierPatchRequest) returns (Identifier);\n")
+	x.Contains(src, "message IdentifierPatchRequest {")
+	x.NotContains(src, "rpc Apply(")
+	x.NotContains(src, "ApplyRequest")
+	x.NotContains(src, `import "patch/patch.proto";`)
+
+	// And beside an entity of the same file that has Apply.
+	svc := block(t, files["apptest/tenant_svc.g.proto"], "service TenantService")
+	x.Contains(svc, "rpc Patch(TenantPatchRequest)")
+	x.NotContains(svc, "rpc Apply(")
+	x.NotContains(files["apptest/tenant_svc.g.proto"], "TenantApplyRequest")
+}
+
+// Apply is there without Patch where only `apply` is asked for: its request,
+// the Ref it names and the patch document's import, and no PatchRequest.
+func TestRpcApplyWithoutPatch(t *testing.T) {
+	x := require.New(t)
+
+	files := generate(t)
+	src, ok := files["apptest/tenant_svc.g.proto"]
+	x.True(ok, "generated: %v", slices.Sorted(maps.Keys(files)))
+
+	svc := block(t, src, "service PreferenceService")
+	x.Contains(svc, "\trpc Apply(PreferenceApplyRequest) returns (Preference);")
+	x.NotContains(svc, "rpc Patch(")
+
+	x.Contains(src, `import "patch/patch.proto";`)
+	x.Contains(src, strings.Join([]string{
+		"message PreferenceApplyRequest {",
+		"\tPreferenceRef ref = 1;",
+		"\tpatch.Patch patch = 2;",
+		"}",
+	}, "\n"))
+	x.Contains(src, "message PreferenceRef {")
+	x.NotContains(src, "PreferencePatchRequest")
 }
 
 // AddMany is a list of the entity's own AddRequest in and the rows out, so that
@@ -156,7 +197,7 @@ func TestRpcAddMany(t *testing.T) {
 	}, "\n"))
 }
 
-// And only where the entity asked for it: `crud` alone is no AddMany.
+// And only where the entity asked for it: an Add alone is no AddMany.
 func TestRpcAddManyIsAskedFor(t *testing.T) {
 	x := require.New(t)
 
